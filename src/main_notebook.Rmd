@@ -57,7 +57,7 @@ Vous devez déposer votre rapport en format .pdf portant le nom : nom1_nom2_nom3
 
 **2. effectuer un prétraitement de votre base de données (si nécessaire)**
 
--   Effectuer une analyse descriptive de base (regarder ce qu'il est possible de déduire de la fonction `summary`, en faire un résumé, regarder ce qui ressort de la fonction `pairs`, et la fonction `quantile`)
+-   Effectuer une analyse descriptive de base (regarder ce qu'il est possible de déduire de la fonction `summary`, en faire un résumé, regarder ce qui ressort de la fonction `pairs`, et la fonction `quantile`, peut-être la matrice de corrélations ?)
 -   Il y a-t-il des données ordinales ? [Oui.] Qualitatives ? [Oui.] Comment est-ce qu'on pourrait les traiter le mieux possible ? Les utiliser comme marqueurs dans la PCA et la CAH ?
 
 **3. justifier le choix de votre approche**
@@ -66,8 +66,8 @@ Vous devez déposer votre rapport en format .pdf portant le nom : nom1_nom2_nom3
 
 **4. tester l'approche choisie sur l'ensemble de données en utilisant les options vues en cours**
 
-* Idéalement, je pense qu'il serait bien d'enregistrer un fichier `results.csv`, contenant les données de bases et une colonne pour chaque résultat pertinent.
-* Dans certains cas, il pourrait être intéressant de diviser le jeu de données en différents sous-jeux (par exemple, les voitures d'une certaine décennie, ou les voitures avec un certain type de moteur) et regarder comment les résultats varient au sein de ces sous-jeux. 
+-   Idéalement, je pense qu'il serait bien d'enregistrer un fichier `results.csv`, contenant les données de bases et une colonne pour chaque résultat pertinent.
+-   Dans certains cas, il pourrait être intéressant de diviser le jeu de données en différents sous-jeux (par exemple, les voitures d'une certaine décennie, ou les voitures avec un certain type de moteur) et regarder comment les résultats varient au sein de ces sous-jeux.
 
 **5. analyser et commenter les résultats obtenus**
 
@@ -107,7 +107,6 @@ plot(cah)
 ```{r quantile}
 apply(cars[1:7], MARGIN=2, FUN=quantile, probs=seq(0, 1, 0.1))
 ```
-
 
 *Sur le graphique des résultats changez les titres des axes x et y par `Individus` et `Seuil` et le titre du graphique par `Dendogramme`. Changez par la suite la couleur des titres par du rouge.*
 
