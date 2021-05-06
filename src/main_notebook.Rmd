@@ -41,16 +41,42 @@ Le projet sera jugé selon les critères suivants:
 Vous devez déposer votre rapport en format .pdf portant le nom :
 nom1_nom2_nom3_trinomeX.pdf au plus tard le 20 mai 2021 sous Moodle dans le dossier Rendu_projet_TND.
 
-```{r read_data}
-cars <- read.table("../data/275-cars.txt", sep=",", header=T)
-cars
+```{r question-5-lecture-donnees}
+#' Affiche une visualisation générique des données contenues dans le fichier
+#' passé en argument.
+#'
+#' @param file Le chemin vers le fichier contenant les données à visualiser
+#' Le fichier doit être un fichier CSV dont les valeurs sont séparés par
+#' des virgules et comportant un en-tête.
+#' @return Les données extraites du fichier
+importAndPlot = function(file) {
+    data <- read.table(file, sep=",", header=T)
+    summary(cars)
+    nums <- unlist(lapply(data, is.numeric))  
+    pairs(data[, nums])
+    return(data)
+}
+
+cars = importAndPlot("../data/275-cars.txt")
 ```
 
-```{r summary}
-summary(cars)
-```
 ```{r cah, out.width = "500px", fig.align='center', echo=FALSE}
 library(cluster)
 cah <- agnes(cars[, c(1:7)], diss=F, metric="euclidean", stand=T, method="ward")
 plot(cah)
+```
+
+*Sur le graphique des résultats changez les titres des axes x et y par `Individus` et `Seuil` et le titre du graphique par `Dendogramme`. Changez par la suite la couleur des titres par du rouge.*
+```{r q1-5, out.width = "500px", fig.align='center', echo=FALSE}
+plot(cah, 
+     xlab="Individus", ylab="Seuil", main="Dendogramme", 
+     col.axis="red", col.main="red")
+```
+
+
+*Analysez la fonction `catdes()`. Utilisez cette fonction par rapport à la 14e variable du jeu de données `decathlon`.*
+```{r q1-8-2}
+library(FactoMineR)
+# paramètres à ajuster
+catdes(decathlon1[, c(1:7)], 7)
 ```
