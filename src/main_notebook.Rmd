@@ -12,34 +12,72 @@ abstract: |
 tags: [data analysis, cars, dataset, R, notebook, pca, clustering, statistics]
 ---
 
-#Sujet du projet
+# Sujet
+
+## Sujet du projet
+
 Ce projet est un travail sur données réelles. Il s'agit de mettre en oeuvre une ou plusieurs méthodes vues en cours sur un jeu de données proposé pour chaque groupe.
 
 Le projet doit suivre les étapes suivantes :
-- analyser le jeu de données proposé afin de choisir l’approche la plus adaptée à votre problème,
-- effectuer un prétraitement de votre base de données (si nécessaire),
-- justifier le choix de votre approche,
-- tester l’approche choisie sur l’ensemble de données en utilisant les options vues en cours,
-- analyser et commenter les résultats obtenus.
 
-#Présentation du rapport
+-   analyser le jeu de données proposé afin de choisir l'approche la plus adaptée à votre problème,
+-   effectuer un prétraitement de votre base de données (si nécessaire),
+-   justifier le choix de votre approche,
+-   tester l'approche choisie sur l'ensemble de données en utilisant les options vues en cours,
+-   analyser et commenter les résultats obtenus.
+
+## Présentation du rapport
+
 Le rapport du projet doit présenter de façon claire et concise:
-- l'objet de l'analyse,
-- la description des données (individus/variables utilisées, variables supplémentaires etc.),
-- l'analyse proprement dite,
-- les commentaires sur les résultats obtenus.
+
+-   l'objet de l'analyse,
+-   la description des données (individus/variables utilisées, variables supplémentaires etc.),
+-   l'analyse proprement dite,
+-   les commentaires sur les résultats obtenus.
 
 Ce rapport ne devrait pas dépasser 10 pages (les codes sources des programmes utilisés peuvent être mis en annexe).
 
 Le projet sera jugé selon les critères suivants:
-- adéquation des méthodes utilisées aux données et problème étudiés,
-- richesse des analyses proposées (au delà du minimum requis),
-- justesse des commentaires sur les résultats,
-- qualité de la présentation du rapport.
 
-#Remise du projet
-Vous devez déposer votre rapport en format .pdf portant le nom :
-nom1_nom2_nom3_trinomeX.pdf au plus tard le 20 mai 2021 sous Moodle dans le dossier Rendu_projet_TND.
+-   adéquation des méthodes utilisées aux données et problème étudiés,
+-   richesse des analyses proposées (au delà du minimum requis),
+-   justesse des commentaires sur les résultats,
+-   qualité de la présentation du rapport.
+
+## Remise du projet
+
+Vous devez déposer votre rapport en format .pdf portant le nom : nom1_nom2_nom3_trinomeX.pdf au plus tard le 20 mai 2021 sous Moodle dans le dossier Rendu_projet_TND.
+
+# Notes sur les différentes étapes
+
+**1. analyser le jeu de données proposé afin de choisir l'approche la plus adaptée à votre problème**
+
+-   Pour la description des données, tout ce qu'on a besoin de savoir est là : <https://www.kaggle.com/yugagrawal95/k-means-clustering-using-seaborn-visualization>. Décrire les différentes colonnes du jeu de données, les valeurs pouvant être prises par celles-ci, leur type, etc. Le nombre de colonnes aussi et la syntaxe comptent aussi. Quelles sont les données ordinales/qualitatives et quelles sont les données quantitatives.
+-   Il faut poser une problématique, aussi générale soit-elle. Par exemple, quelle est l'influence des diverses variables sur les performances d'une voiture ? Comprendre quelles sont les avantages et les inconvénients d'avoir plus de chevaux, une plus grosse consommation d'essence, etc.
+
+**2. effectuer un prétraitement de votre base de données (si nécessaire)**
+
+-   Effectuer une analyse descriptive de base (regarder ce qu'il est possible de déduire de la fonction `summary`, en faire un résumé, regarder ce qui ressort de la fonction `pairs`, et la fonction `quantile`)
+-   Il y a-t-il des données ordinales ? [Oui.] Qualitatives ? [Oui.] Comment est-ce qu'on pourrait les traiter le mieux possible ? Les utiliser comme marqueurs dans la PCA et la CAH ?
+
+**3. justifier le choix de votre approche**
+
+-   Choisir un ensemble d'algorithmes à utiliser parmi ceux qu'on a vu (k-means, PCA, CAH) et expliquer en quoi il serait pertinent de les utiliser au vu de ce qu'on a déduit du point précédent.
+
+**4. tester l'approche choisie sur l'ensemble de données en utilisant les options vues en cours**
+
+* Idéalement, je pense qu'il serait bien d'enregistrer un fichier `results.csv`, contenant les données de bases et une colonne pour chaque résultat pertinent.
+* Dans certains cas, il pourrait être intéressant de diviser le jeu de données en différents sous-jeux (par exemple, les voitures d'une certaine décennie, ou les voitures avec un certain type de moteur) et regarder comment les résultats varient au sein de ces sous-jeux. 
+
+**5. analyser et commenter les résultats obtenus**
+
+-   Se baser sur les corrections fournies pour les TD 5 et 6.
+
+**2. Objet de l'analyse**
+
+-   Expliciter des tendances sous-jacentes du jeu de données, analyse descriptive du jeu de données pour mieux comprendre les liens entre les différentes variables, et ainsi mieux comprendre les performances des véhicules en fonction de leurs attributs.
+
+# Code
 
 ```{r question-5-lecture-donnees}
 #' Affiche une visualisation générique des données contenues dans le fichier
@@ -66,15 +104,21 @@ cah <- agnes(cars[, c(1:7)], diss=F, metric="euclidean", stand=T, method="ward")
 plot(cah)
 ```
 
+```{r quantile}
+apply(cars[1:7], MARGIN=2, FUN=quantile, probs=seq(0, 1, 0.1))
+```
+
+
 *Sur le graphique des résultats changez les titres des axes x et y par `Individus` et `Seuil` et le titre du graphique par `Dendogramme`. Changez par la suite la couleur des titres par du rouge.*
+
 ```{r q1-5, out.width = "500px", fig.align='center', echo=FALSE}
 plot(cah, 
      xlab="Individus", ylab="Seuil", main="Dendogramme", 
      col.axis="red", col.main="red")
 ```
 
-
 *Analysez la fonction `catdes()`. Utilisez cette fonction par rapport à la 14e variable du jeu de données `decathlon`.*
+
 ```{r q1-8-2}
 library(FactoMineR)
 # paramètres à ajuster
