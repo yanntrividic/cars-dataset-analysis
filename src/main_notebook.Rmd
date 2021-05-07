@@ -52,22 +52,26 @@ Vous devez déposer votre rapport en format .pdf portant le nom : nom1_nom2_nom3
 
 **1. analyser le jeu de données proposé afin de choisir l'approche la plus adaptée à votre problème**
 
--   Pour la description des données, tout ce qu'on a besoin de savoir est là : <https://www.kaggle.com/yugagrawal95/k-means-clustering-using-seaborn-visualization>. Décrire les différentes colonnes du jeu de données, les valeurs pouvant être prises par celles-ci, leur type, etc. Le nombre de colonnes aussi et la syntaxe comptent aussi. Quelles sont les données ordinales/qualitatives et quelles sont les données quantitatives.
--   Il faut poser une problématique, aussi générale soit-elle. Par exemple, quelle est l'influence des diverses variables sur les performances d'une voiture ? Comprendre quelles sont les avantages et les inconvénients d'avoir plus de chevaux, une plus grosse consommation d'essence, etc.
+-   Pour la **description des données**, tout ce qu'on a besoin de savoir est là : <https://www.kaggle.com/yugagrawal95/k-means-clustering-using-seaborn-visualization>. Décrire les différentes colonnes du jeu de données, les valeurs pouvant être prises par celles-ci, leur mode (numérique [entier, double, continue, discret], caractère, logique, `NULL`...), etc. Le nombre de colonnes aussi et la syntaxe comptent aussi. Quelles sont les données ordinales/qualitatives et quelles sont les données quantitatives.
+-   Il faut **poser une problématique**, aussi générale soit-elle. Par exemple, quelle est l'influence des diverses variables sur les performances d'une voiture ? Comprendre quelles sont les avantages et les inconvénients d'avoir plus de chevaux, une plus grosse consommation d'essence, etc.
+-   Combien a-t-on d'individus, combien de variables ?
 
 **2. effectuer un prétraitement de votre base de données (si nécessaire)**
 
--   Effectuer une analyse descriptive de base (regarder ce qu'il est possible de déduire de la fonction `summary`, en faire un résumé, regarder ce qui ressort de la fonction `pairs`, et la fonction `quantile`, peut-être la matrice de corrélations ?)
--   Il y a-t-il des données ordinales ? [Oui.] Qualitatives ? [Oui.] Comment est-ce qu'on pourrait les traiter le mieux possible ? Les utiliser comme marqueurs dans la PCA et la CAH ?
+-   Effectuer une **analyse descriptive de base** (regarder ce qu'il est possible de déduire de la fonction `summary`, en faire un résumé, regarder ce qui ressort de la fonction `pairs`, et la fonction `quantile`, peut-être la matrice de corrélations ?)
+-   Il y a-t-il des données ordinales ? [Non.] Textuelles ? [Oui, mais non, c'est pas des textes] Qualitatives ? [Oui.] Nominales ? [Oui.] Comment est-ce qu'on pourrait les traiter le mieux possible ? Les utiliser comme marqueurs dans la PCA et la CAH ?
+-   Est-ce que tous les objets sont complets ? Il y a-t-il des **valeurs manquantes** (fonction `is.na`) ? Il y a-t-il des **valeurs aberrantes** à enlever (justifier pourquoi on les enlève) ? Décide-t-on de tolérer une marge d'erreur, remplacer les valeurs, supprimer les individus ? Essayer de comprendre pourquoi ces valeurs sont là, proposer des hypothèses si pertinent. Avec k-means par exemple, les valeurs aberrantes peuvent donner des résultats erronés. La forme des clusters est aussi importante.
 
 **3. justifier le choix de votre approche**
 
--   Choisir un ensemble d'algorithmes à utiliser parmi ceux qu'on a vu (k-means, PCA, CAH) et expliquer en quoi il serait pertinent de les utiliser au vu de ce qu'on a déduit du point précédent.
+-   Choisir un ensemble d'algorithmes à utiliser parmi ceux qu'on a vu (k-means, PCA, CAH) et expliquer en quoi il serait pertinent de les utiliser au vu de ce qu'on a déduit du point précédent. Pour déterminer quel algo choisir, se référer aux caractéristiques des méthodes de classification (voir cours).
+-   Avec chacun des algorithmes utilisés, justifier le choix la valeur de chacun des paramètres (exemple : pourquoi utiliser la méthode de Ward (voir cours) ? Quel critère de qualité ?)
+-   Ajouter l'utilisation d'autres d'outils statistiques : regression, chi², degré d'asymétrie (skewness), degré d'aplatissement (Kurtosis)...
 
 **4. tester l'approche choisie sur l'ensemble de données en utilisant les options vues en cours**
 
--   Idéalement, je pense qu'il serait bien d'enregistrer un fichier `results.csv`, contenant les données de bases et une colonne pour chaque résultat pertinent.
--   Dans certains cas, il pourrait être intéressant de diviser le jeu de données en différents sous-jeux (par exemple, les voitures d'une certaine décennie, ou les voitures avec un certain type de moteur) et regarder comment les résultats varient au sein de ces sous-jeux.
+-   Idéalement, je pense qu'il serait bien d'**enregistrer un fichier** `results.csv`, contenant les données de bases et une colonne pour chaque résultat pertinent.
+-   Dans certains cas, il pourrait être intéressant de **diviser le jeu de données en différents sous-jeux** (par exemple, les voitures d'une certaine décennie, ou les voitures avec un certain type de moteur) et regarder comment les résultats varient au sein de ces sous-jeux. Pour ça, utiliser la fonction `aggregate`.
 
 **5. analyser et commenter les résultats obtenus**
 
