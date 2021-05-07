@@ -59,19 +59,26 @@ Vous devez déposer votre rapport en format .pdf portant le nom : nom1_nom2_nom3
 **2. effectuer un prétraitement de votre base de données (si nécessaire)**
 
 -   Effectuer une **analyse descriptive de base** (regarder ce qu'il est possible de déduire de la fonction `summary`, en faire un résumé, regarder ce qui ressort de la fonction `pairs`, et la fonction `quantile`, peut-être la matrice de corrélations ?)
--   Il y a-t-il des données ordinales ? [Non.] Textuelles ? [Oui, mais non, c'est pas des textes] Qualitatives ? [Oui.] Nominales ? [Oui.] Comment est-ce qu'on pourrait les traiter le mieux possible ? Les utiliser comme marqueurs dans la PCA et la CAH ?
+-   Il y a-t-il des données ordinales ? [Non.] Textuelles ? [Oui, mais non, c'est pas des textes] Qualitatives ? [Oui.] Nominales ? [Oui.] Comment est-ce qu'on pourrait les traiter le mieux possible ? Les utiliser comme marqueurs dans la PCA et la CAH ? Par défaut, on mettra les variables qualitatives en tant que variables supplémentaires (ni l'ACP ni la CAH ne peuvent les traiter). Certaines variables quantitatives peuvent être considérées comme supplémentaires (par exemple, les variables qui décrivent d'autres variables ; le pH et le taux d'acide citrique)
+-   Lister les variables qui sont le plus corrélées. On devrait retrouver ces corrélations dans les résultats de l'ACP
+-   Potentiellement centrer les valeurs si les résultats de l'analyse univariée donne des résultats très hétérogènes. Càd si les valeurs prises par les variables sont sur des intervalles/variances/moyennes très différents.
 -   Est-ce que tous les objets sont complets ? Il y a-t-il des **valeurs manquantes** (fonction `is.na`) ? Il y a-t-il des **valeurs aberrantes** à enlever (justifier pourquoi on les enlève) ? Décide-t-on de tolérer une marge d'erreur, remplacer les valeurs, supprimer les individus ? Essayer de comprendre pourquoi ces valeurs sont là, proposer des hypothèses si pertinent. Avec k-means par exemple, les valeurs aberrantes peuvent donner des résultats erronés. La forme des clusters est aussi importante.
 
 **3. justifier le choix de votre approche**
 
--   Choisir un ensemble d'algorithmes à utiliser parmi ceux qu'on a vu (k-means, PCA, CAH) et expliquer en quoi il serait pertinent de les utiliser au vu de ce qu'on a déduit du point précédent. Pour déterminer quel algo choisir, se référer aux caractéristiques des méthodes de classification (voir cours).
--   Avec chacun des algorithmes utilisés, justifier le choix la valeur de chacun des paramètres (exemple : pourquoi utiliser la méthode de Ward (voir cours) ? Quel critère de qualité ?)
+-   Choisir un ensemble d'algorithmes à utiliser parmi ceux qu'on a vu (k-means, PCA, CAH, HCPC) et expliquer en quoi il serait pertinent de les utiliser au vu de ce qu'on a déduit du point précédent. Pour déterminer quel algo choisir, se référer aux caractéristiques des méthodes de classification (voir cours).
+
+    -   Pourquoi l'ACP ? Trouver des individus similaires ; comment est-ce qu'une caractéristique va affecter les valeurs des autres caractéristiques, etc.
+
+-   Avec chacun des algorithmes utilisés, justifier le choix la valeur de chacun des paramètres (exemple : pourquoi utiliser la méthode de Ward (voir cours), quels sont les résultats avec les autres méthodes ? Quel critère de qualité ?)
+
 -   Ajouter l'utilisation d'autres d'outils statistiques : regression, chi², degré d'asymétrie (skewness), degré d'aplatissement (Kurtosis)...
 
 **4. tester l'approche choisie sur l'ensemble de données en utilisant les options vues en cours**
 
 -   Idéalement, je pense qu'il serait bien d'**enregistrer un fichier** `results.csv`, contenant les données de bases et une colonne pour chaque résultat pertinent.
 -   Dans certains cas, il pourrait être intéressant de **diviser le jeu de données en différents sous-jeux** (par exemple, les voitures d'une certaine décennie, ou les voitures avec un certain type de moteur) et regarder comment les résultats varient au sein de ces sous-jeux. Pour ça, utiliser la fonction `aggregate`.
+-   Consolider les résultats (consolider les résultats de la PCA avec HCPC).
 
 **5. analyser et commenter les résultats obtenus**
 
@@ -83,33 +90,88 @@ Vous devez déposer votre rapport en format .pdf portant le nom : nom1_nom2_nom3
 
 # Code
 
-```{r question-5-lecture-donnees}
-#' Affiche une visualisation générique des données contenues dans le fichier
-#' passé en argument.
+## Lecture des données
+
+Les données sont contenues dans un fichier `TXT`, les colonnes sont séparées par le caractère `,` et les lignes par un retour à la ligne. Les valeurs décimales sont séparées des valeurs entières par le caractère `.`.
+
+```{r read_file}
+cars = read.table(file, sep=",", header=T)
+```
+
+## Descriptions du jeu de données
+
+```{r dataset_dimensions}
+dim(cars)
+```
+
+Le jeu de données cars contient 261 individus définis par 8 variables. Chaque individu représente une liste de caractéristiques d'une voiture. En se basant sur [ce lien](https://www.kaggle.com/abineshkumark/carsdata), on obtient les descriptions suivantes :
+
+1.  `mpg` [numérique, réel, continu] : la quantité prédite de gallons par mile (continue, arrondie à l'unité)
+2.  `cylinders` [numérique, entier, discret] : le nombre de cylindres dans le moteur. Peut être 4, 6 ou 8.
+3.  `cubicinches` [numérique, entier, continu] : mesure du volume du moteur de la voiture en pouces cube.
+4.  `hp` [numérique, entier, continu] : puissance réelle du moteur en chevaux.
+5.  `weightlbs` [numérique, entier, continu] : le poids de la voiture en livres.
+6.  `time.to.60` [numérique, entier, continu] : durée nécessaire pour aller de 0 à 60 milles par heure.
+7.  `year` [numérique, entier, discret] : année de fabrication de la voiture.
+8.  `brand` [textuel, qualitatif, nominal] : région géographique de la marque de la voiture.
+
+## Prétraitement
+
+```{r na_values}
+cars[rowSums(is.na(cars)) > 0,] # counts the number of rows with NA values 
+```
+
+Le jeu de données ne contient aucune valeur manquante, il peut donc être utilisé tel quel pour la suite de l'analyse.
+
+Pour l'instant, seule la variable `brand` peut être considérée comme une variable supplémentaire car celle-ci est une variable textuelle et nominale. Au premier abord, toutes les autres variables doivent être utilisés dans l'analyse, celles-ci ne semblant pas être liées entre elles directement.
+
+## Analyse univariée
+
+```{r summary}
+summary(cars[-8]) # the last column is not included as it is a textual variable
+```
+
+```{r quantiles}
+apply(cars[1:7], MARGIN=2, FUN=quantile, probs=seq(0, 1, 0.1))
+```
+
+```{r correlations}
+cars.correlations <- cor(cars[-8]) # the last column is not included as it is a textual variable
+#write.csv(cars.correlations, file="../data/correlations.csv")
+
+library(corrplot)
+corrplot(cars.correlations)
+
+#' Fonction permettant d'ordonner les différentes corrélations par ordre
+#' décroissant par défaut en fonction de la valeur absolue de la corrélation
 #'
-#' @param file Le chemin vers le fichier contenant les données à visualiser
-#' Le fichier doit être un fichier CSV dont les valeurs sont séparés par
-#' des virgules et comportant un en-tête.
-#' @return Les données extraites du fichier
-importAndPlot = function(file) {
-    data <- read.table(file, sep=",", header=T)
-    summary(cars)
-    nums <- unlist(lapply(data, is.numeric))  
-    pairs(data[, nums])
-    return(data)
+#' @param df le dataframe dont les corrélations sont à extraire
+#' @param order paramètre optionnel pour préciser l'ordre de tri (defaut:décroi)
+#' @param threshold paramètre optionnel pour préciser un seuil (défaut: <=0.5)
+#' @return un tableau contenant les corrélations ordonnées
+getOrderedCorrelations <- function(df, order=T, threshold=0.5) {
+    orderedCor <- as.data.frame(as.table(df))
+    orderedCor <- orderedCor[order(abs(orderedCor$Freq), decreasing=order),]
+    orderedCor <- orderedCor[orderedCor$Freq<1 & orderedCor$Freq>=threshold,]
+    return(orderedCor)
 }
 
-cars = importAndPlot("../data/275-cars.txt")
+# TODO: enlever les corrélations en double
+getOrderedCorrelations(cars.correlations)
 ```
+
+```{r boxplots}
+for (i in 1:length(cars[-8])) {
+    boxplot(cars[,i], main=names(cars[i]), type="l")
+}
+```
+
+## Classification ascendante hiérarchique
 
 ```{r cah, out.width = "500px", fig.align='center', echo=FALSE}
 library(cluster)
 cah <- agnes(cars[, c(1:7)], diss=F, metric="euclidean", stand=T, method="ward")
 plot(cah)
-```
-
-```{r quantile}
-apply(cars[1:7], MARGIN=2, FUN=quantile, probs=seq(0, 1, 0.1))
 ```
 
 *Sur le graphique des résultats changez les titres des axes x et y par `Individus` et `Seuil` et le titre du graphique par `Dendogramme`. Changez par la suite la couleur des titres par du rouge.*
@@ -120,10 +182,18 @@ plot(cah,
      col.axis="red", col.main="red")
 ```
 
+## Analyse en composantes principales
+
 *Analysez la fonction `catdes()`. Utilisez cette fonction par rapport à la 14e variable du jeu de données `decathlon`.*
 
 ```{r q1-8-2}
 library(FactoMineR)
 # paramètres à ajuster
 catdes(decathlon1[, c(1:7)], 7)
+```
+
+## Classification hiérarchique sur composantes principales
+
+```{r}
+
 ```
