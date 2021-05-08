@@ -96,11 +96,17 @@ Vous devez déposer votre rapport en format .pdf portant le nom : nom1_nom2_nom3
 
 -   Idéalement, je pense qu'il serait bien d'**enregistrer un fichier** `results.csv`, contenant les données de bases et une colonne pour chaque résultat pertinent.
 -   Dans certains cas, il pourrait être intéressant de **diviser le jeu de données en différents sous-jeux** (par exemple, les voitures d'une certaine décennie, ou les voitures avec un certain type de moteur) et regarder comment les résultats varient au sein de ces sous-jeux. Pour ça, utiliser la fonction `aggregate`.
--   Consolider les résultats (consolider les résultats de la PCA avec HCPC).
+-   Consolider les résultats (consolider les résultats de la PCA avec HCPC, les résultats de la CAH avec k-means, etc.).
 
 **5. analyser et commenter les résultats obtenus**
 
 -   Se baser sur les corrections fournies pour les TD 5 et 6.
+-   **Caractérisation des classes :** la partition obtenue peut être considérée comme une variable quantitative, chercher une variable qui caractérise le mieux une partition revient à chercher les variables qui caractérisent le mieux cette variable qualitative. Pour chaque variable quantitative, on va construire un modèle d'analyse de variance entre la variable quantitative, qui aura de le rôle de la variable réponse, en fonction de la variable de classe (qualitative). On construit ensuite un test de Fisher pour voir s'il y a un effet de la variable de classe sur la variable quantitative. On peut concerver les variables ayant une probabilité critique inférieure à 5 %, et trier ces variables par probabilité croissante. Attention : les variables ayant eu un rôle actif dans la construction des résultats (par exemple lorsqu'elles participent au calcul de la distance) ne sont pas totalement indépendantes des classes attribuées. Seules les probabilités critiques associées aux variables supplémentaires (dans notre cas, `brand`) peuvent être réellement interprétées comme décrit ici. Le test de Fisher nous permettrait donc de vérifier nos résultats de manière quantifiée et de savoir si les classes obtenues seraient représentatives ou non des classes obtenues avec les différents algorithmes de partitionnement.
+-   On pourrait potentiellement colorer les résultats de l'ACP en fonction de certaines variables ayant beaucoup contribué dans les axes principaux.
+-   Calculer quel est le nombre d'axe optimal à garder grâce au pourcentage d'inertie de l'ACP. Pareil pour la CAH.
+-   Pour l'ACP, vérifier la qualité de la projection des différentes variables en regardant le cos² associé à cette variable.
+-   Dans certains cas, un axe de l'ACP peut avoir été défini par un seul individu, ou une seule variable. Il peut être intéressant de refaire une ACP sans cette variable/individu si l'interprétation de ce phénomène le justifie.
+-   Pour chaque interprétation, il est important de revenir aux données de départ pour les valider et citer des exemples.\
 
 **2. Objet de l'analyse**
 
@@ -131,7 +137,7 @@ En se basant sur [ce lien](https://www.kaggle.com/abineshkumark/carsdata), on ob
 <br>1.
 `mpg` [numérique, réel, continu] : la quantité prédite de gallons par mile (continue, arrondie à l'unité) <br>2.
 `cylinders` [numérique, entier, discret] : le nombre de cylindres dans le moteur.
-Peut être 4, 6 ou 8.
+Peut être 3, 4, 6 ou 8.
 <br>3.
 `cubicinches` [numérique, entier, continu] : mesure du volume du moteur de la voiture en pouces cube.
 <br>4.
