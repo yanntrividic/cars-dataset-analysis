@@ -134,21 +134,22 @@ Le jeu de données cars contient 261 individus définis par 8 variables.
 Chaque individu représente une liste de caractéristiques d'une voiture.
 En se basant sur [ce lien](https://www.kaggle.com/abineshkumark/carsdata), on obtient les descriptions suivantes :
 
-<br>1.
-`mpg` [numérique, réel, continu] : la quantité prédite de gallons par mile (continue, arrondie à l'unité) <br>2.
+1.
+`mpg` [numérique, réel, continu] : la quantité prédite de gallons par mile (continue, arrondie à l'unité) 
+2.
 `cylinders` [numérique, entier, discret] : le nombre de cylindres dans le moteur.
 Peut être 3, 4, 6 ou 8.
-<br>3.
+3.
 `cubicinches` [numérique, entier, continu] : mesure du volume du moteur de la voiture en pouces cube.
-<br>4.
+4.
 `hp` [numérique, entier, continu] : puissance réelle du moteur en chevaux.
-<br>5.
+5.
 `weightlbs` [numérique, entier, continu] : le poids de la voiture en livres.
-<br>6.
+6.
 `time.to.60` [numérique, entier, continu] : durée nécessaire pour aller de 0 à 60 milles par heure.
-<br>7.
+7.
 `year` [numérique, entier, discret] : année de fabrication de la voiture.
-<br>08.
+08.
 `brand` [textuel, qualitatif, nominal] : région géographique de la marque de la voiture.
 
 ## Prétraitement
@@ -168,9 +169,9 @@ Au premier abord, toutes les autres variables doivent être utilisés dans l'ana
 
 ## Analyse univariée
 
-<br>Nous allons dès à présent porcéder à une analyse univariée de notre base de données
+Nous allons dès à présent porcéder à une analyse univariée de notre base de données
 
-<p style="text-align:justify;">
+
 
 Grâce à la fonction summary, nous avons un aperçu global des différentes variables composant notre base de données en calculant des statistiques de base.
 Pour les variables quantitatives il y a : Minimum, maximum, moyenne, médiane, 1er quartile, 3ème quartile.
@@ -179,7 +180,7 @@ Pour les variables quantitatives il y a : Minimum, maximum, moyenne, médiane, 1
 summary(cars[-8]) # the last column is not included as it is a textual variable
 ```
 
-<p style="text-align:justify;">
+
 
 Pour calculer des quantiles d'un jeu d'observations stocké dans un vecteur v, nous utilisons la fonction quantile.
 Sans plus d'argument, celle-ci calcule les quantiles à 0%, 25%, 50%, 75%,100%.
@@ -189,9 +190,9 @@ Pour avoir les quantiles à d'autres ordres, il faut manipuler le paramètre pro
 apply(cars[1:7], MARGIN=2, FUN=quantile, probs=seq(0, 1, 0.1))
 ```
 
-<p style="text-align:justify;">
 
-<br>Une matrice de corrélation est utilisée pour évaluer la dépendence entre plusieurs variables de façon simultanée.
+
+Une matrice de corrélation est utilisée pour évaluer la dépendence entre plusieurs variables de façon simultanée.
 Le résultat est une table contenant les coefficients de corrélation entre chaque variable et les autres.
 
 Pour la calculer , R propose la fonction cor().
@@ -203,17 +204,17 @@ cars.correlations <- cor(cars[-8]) # the last column is not included as it is a 
 cars.correlations
 ```
 
-<p style="text-align:justify;">
+
 
 Nous pouvons également visualiser et représenter graphiquement notre matrice avec un corrélogramme.
 Cet outil permet de mettre en évidence les variables les plus corrélées : les coefficients de corrélation sont colorés en fonction de leur valeur.
 Ici ils ont été ordonné fonction du degré de corrélation.
 Nous voyons bien, grâce au coefficient de corrélation affiché pour chaque variable en fonction des autres,lesquelles sont les plus dépendantes
 
-<p style="text-align:justify;">
 
-<br>La valeur 1 signifie que les deux variables sont exactement corrélées, c'est le cas d'une relation exactement linéaire entre deux variables.
-<br>Le 0.95 entre cylindre et cubinches signifie que le nombre de cylindres du véhicule(cubinches) joue pour 90,25% (0,95)\*(0,95)sur la valeur du volume moteur
+
+La valeur 1 signifie que les deux variables sont exactement corrélées, c'est le cas d'une relation exactement linéaire entre deux variables.
+Le 0.95 entre cylindre et cubinches signifie que le nombre de cylindres du véhicule(cubinches) joue pour 90,25% (0,95)\*(0,95)sur la valeur du volume moteur
 
 ```{r corrplot}
 library(corrplot)
@@ -237,19 +238,19 @@ getOrderedCorrelations <- function(df, order=T, threshold=0.5) {
 getOrderedCorrelations(cars.correlations)
 ```
 
-<p style="text-align:justify;">
+
 
 Un box-plot est un graphique composé d'un rectangle, deux droites sortent afin de représenter certains éléments des données.
 
-<p style="text-align:justify;">
+
 
 La valeur centrale du graphique est la médiane (il existe autant de valeur supérieures qu'inférieures à cette valeur dans l'échantillon).
 
-<p style="text-align:justify;">
+
 
 Les bords du rectangle sont les quartiles (Pour le bord inférieur, un quart des observations ont des valeurs plus petites et trois quart ont des valeurs plus grandes, le bord supérieur suit le même raisonnement).
 
-<p style="text-align:justify;">
+
 
 Les extrémités des moustaches sont calculées en utilisant 1.5 fois l'espace interquartile (la distance entre le 1er et le 3ème quartile).
 On peut remarquer que 50% des observations se trouvent à l'intérieur de la boîte.Pour
