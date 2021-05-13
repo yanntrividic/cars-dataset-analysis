@@ -235,7 +235,9 @@ getOrderedCorrelations <- function(df, order=T, threshold=0.5) {
 }
 
 # TODO: enlever les corrélations en double
-getOrderedCorrelations(cars.correlations)
+orderedCor = getOrderedCorrelations(cars.correlations)
+print(orderedCor)
+orderedCor[!duplicated(orderedCor)]
 ```
 
 
