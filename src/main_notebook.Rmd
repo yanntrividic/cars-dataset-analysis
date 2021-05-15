@@ -139,7 +139,7 @@ En se basant sur [ce lien](https://www.kaggle.com/abineshkumark/carsdata), on ob
 5.  `weightlbs` [numérique, entier, continu] : le poids de la voiture en livres.
 6.  `time.to.60` [numérique, entier, continu] : durée nécessaire pour aller de 0 à 60 milles par heure.
 7.  `year` [numérique, entier, discret] : année de fabrication de la voiture.
-8.  `brand` [textuel, qualitatif, nominal] : région géographique de la marque de la voiture.
+8.  `brand` [textuel, qualitatif, catégorielle] : région géographique de la marque de la voiture.
 
 ## 3. Prétraitement
 
@@ -153,13 +153,22 @@ cars[rowSums(is.na(cars)) > 0,] # counts the number of rows with NA values
 
 Le jeu de données ne contient aucune valeur manquante, il peut donc être utilisé tel quel pour la suite de l'analyse.
 
-Pour l'instant, seule la variable `brand` peut être considérée comme une variable supplémentaire car celle-ci est une variable textuelle et nominale.
+Pour l'instant, seule la variable `brand` peut être considérée comme une variable supplémentaire car celle-ci est une variable textuelle et catégorielle.
+Nous pouvons par ailleurs la considérer comme de type `factor`.
+
 Au premier abord, toutes les autres variables doivent être utilisés dans l'analyse, celles-ci ne semblant pas être liées entre elles directement.
 On peut noter que les unités de mesure associées aux différentes variables sont toutes différentes ; le jeu de données sera analysé en prenant en compte ces caractéristiques.
+
+```{r normalisation}
+cars$brand = as.factor(cars$brand) # Transformation en factor
+cars.scaled = as.data.frame(cbind(scale(cars[-8]), cars$brand)) # On garde les données textuelles tel quel
+```
 
 ## 4. Analyse univariée
 
 ### 4.1 Sommaire, distributions et critères de position
+
+#### 4.1.1 Variables quantitatives
 
 Grâce à la fonction `summary`, nous avons un aperçu global des différentes distributions des variables composant notre base de données en calculant des statistiques de base (critères de position et critères de dispersion).
 Pour les variables quantitatives, `summary` nous retourne le minimum, le maximum, la moyenne et les trois quartiles.
@@ -188,9 +197,8 @@ On peut remarquer que 50% des observations se trouvent à l'intérieur de la bo�
 **[Yann : je suis pas sûr qu'il soit utile d'expliquer comment lire un boxplot, pour moi les quatre phrases qui précèdent ne sont pas utiles. A la limite, on pourrait mettre un lien vers la page Wiki si vraiment ça semble nécessaire]**
 
 ```{r boxplots}
-for (i in 1:length(cars[-8])) {
-    boxplot(cars[,i], main=names(cars[i]), type="l")
-}
+par(mar=c(7,3,2,2))
+boxplot(cars.scaled[-8], las=2, main="Diagrammes en boîte des variables quantitatives de cars")
 ```
 
 **[Yann : aussi, j'pense que ce serait mieux si on avait en général les interprétations des graphiques après que les graphiques aient été affichés, du coup j'ai déplacé les graphiques]**
@@ -207,6 +215,31 @@ Ici, ces valeurs correspondent à des voitures ayant une accélération anormale
 Ces valeurs ne semblent pas être des erreurs de mesure mais simplement des voitures sortant de la norme.
 Dans certains cas, il est nécessaire d'effectuer un traitement particulier sur ces valeurs.
 Avec ces valeurs en particuliers, nous considérons qu'il est possible de continuer l'analyse en l'état, celles-ci n'allant pas poser pas de problèmes.
+
+#### 4.1.2 Variables qualitatives
+
+Le jeu de données `cars` contient, en plus des sept variables quantitatives déjà abordées, une variable qualitative : la variable `brand`.
+Cette donnée, par sa nature, doit être traitée séparément du reste.
+
+```{r piechart-brand}
+library(ggplot2)
+library(dplyr)
+
+contingency_table <- table(cars$brand) 
+df <- data.frame(brand = names(contingency_table),
+                 Distribution = as.vector(contingency_table))
+
+ggplot(df, aes(x = "", y = Distribution, fill = brand)) +
+    geom_bar(width = 1, stat = "identity", color = "white") +
+    coord_polar("y", start = 0)
+```
+
+Comme on peut le voir, la distribution des individus en fonction de la variable brand est tout sauf uniforme : près de deux tiers sont des voitures américaines tandis que les voitures japonaises et européennes se partagent de manière à peu près égale le dernier tiers des données.
+Cette surréprésentation des voitures américaines sera à prendre en compte tout au long de l'analyse.
+
+```{r table-contingence-brand}
+# TODO: Ajouter la table de contingence en fonction de brand et interpréter les résultats
+```
 
 ### 4.2 Corrélations
 
@@ -228,7 +261,7 @@ La valeur $1$ indique que les deux variables sont exactement corrélées, c'est 
 Les corrélations dont la valeur absolue sont supérieures à $0,5$ peuvent être considérées comme des corrélations fortes.
 Les autres, celles comprises entre $-0,5$ et $0,5$, peuvent être considérées comme des corrélations faibles.
 
-Le 0.95 entre cylindre et cubinches signifie que le nombre de cylindres du véhicule (cubinches) joue pour 90,25% (0,95)\*(0,95) sur la valeur du volume moteur **[Yann : ce n'est pas vrai, une corrélation n'implique pas une causalité]**
+Le 0.95 entre cylindre et cubinches signifie que le nombre de cylindres du véhicule (cubinches) joue pour 90,25% (0,95)\*(0,95) sur la valeur du volume moteur **[Yann : ce n'est pas juste, une corrélation n'implique pas une causalité]**
 
 ```{r corrplot}
 library(corrplot)
@@ -263,10 +296,111 @@ Plus la voiture est grosse et puissante, et plus sa consommation en carburant se
 Des corrélations existent aussi entre ces variables et la variable `time.to.60`, bien qu'elles soient moins importantes.
 On pourra noter que plus une voiture a une consommation de carburant élevée et plus elle aura une forte accélération ; plus son moteur est gros et la voiture lourde, et plus ses capacités d'accélération seront importantes.
 
-## 5. Classification ascendante hiérarchique
+## 5. Classification
+
+La section qui suit est basée sur le travail disponible à [ce lien](https://rstudio-pubs-static.s3.amazonaws.com/579984_6b9efbf84ee24f00985c29e24265d2ba.html).
+
+### 5.1 Tendance à la classification
+
+Avant d'utiliser quelconque algorithme de classification, il peut être intéressant de quantifier la propension du jeu de données à contenir des classes distinctes et pertinentes.
+Cette quantification peut être effectuée grâce au [critère d'Hopkins](https://en.wikipedia.org/wiki/Hopkins_statistic).
+Ce critère permet de mettre une valeur sur le degré d'uniformisation de la distribution des valeurs d'un jeu de données.
+Si la valeur prise par le critère est proche de $0$, alors les distributions sont parfaitement uniformes.
+Si la valeur approche $0,5$, alors distribution des valeurs est proche de celle d'une série générée par une loi de Poisson.
+Les cas qui nous intéressent sont ceux où le critère approche $1$, cette valeur indiquant des classes très clairement définies.
+
+```{r hopkins}
+library(factoextra)
+get_clust_tendency(cars[-8], 100, graph=FALSE)$hopkins_stat 
+```
+
+En utilisant la fonction `get_clust_tendency` de la bibliothèque `factoextra`, on remarque que la valeur prise par le critère de Hopkins pour le jeu de données cars est très forte.
+On peut donc continuer le travail de classification.
+
+### 5.2 K-moyennes
+
+L'algorithme des K-moyennes, très simple à mettre en place et très utilisé dans le domaine de la classification, permet de distinguer des groupes d'individus en minimisant la somme totale des carrés des distance.
+Cette méthode suppose cependant de préciser en paramètre le nombre de classes du jeu de données ; cependant, dans notre cas, l'information est manquante.
+
+Notre jeu de données étant en sept dimensions (sept variables quantitatives), il est difficile de visualiser les résultats de l'algorithme des K-moyennes pour estimer le nombre de classes le plus approprié.
+Afin de surmonter ce problème, il existe de nombreuses approches mathématiques pour quantifier la qualité des résultats de l'algorithme K-moyennes.
+La plus connue est celle du [coefficient de silhouette](https://fr.wikipedia.org/wiki/Silhouette_(clustering)).
+Nous l'utiliserons dans un premier temps pour obtenir des résultats préliminaires.
+
+```{r silhouette}
+fviz_nbclust(cars[-8], FUNcluster = kmeans, method = c("silhouette"), k.max = 15, nboot = 100)
+```
+
+Le coefficient de silhouette mesure la qualité de la partition obtenue après avoir appliqué un algorithme de classification.
+Ici, on lance une série d'algorithmes K-moyennes avec le nombre de classe minimum à $1$ et le maximum à \$15\$.
+On obtient les scores moyens obtenus par les différentes partitions en fonction du nombre de classes.
+
+On remarque que la meilleure partition a obtenu un score d'environ $0,62$ (celui-ci pouvant monter jusqu'à \$1\$) avec deux classes.
+Cependant, les scores obtenus par les partitionnements à trois et quatre classes sont relativement proche du meilleur score.
+La différence entre ces scores n'est pas suffisante pour en garder un seul.
+
+Il est donc préférable de garder les partitionnements à deux, à trois, et à quatre classes comme effectué ci-dessous.
+Il est à noter que, bien que ce ne soit pas précisé explicitement, $10$ itérations de l'algorithme sont effectués pour chaque partitionnement afin de pallier à l'instabilité de K-moyennes à l'initialisation.
+
+```{r k-moyennes}
+cars.cluster2 <- kmeans(cars[-8], 2) # K-moyennes pour partitionnement à deux classes,
+cars.cluster3 <- kmeans(cars[-8], 3) # à trois classes,
+cars.cluster4 <- kmeans(cars[-8], 4) # à quatre classes.
+```
+
+Voici maintenant une visualisation de ces partitionnement couplés aux distributions normalisées des variables :
+
+```{r stripplots-clusters}
+library(lattice)
+library(gridExtra)
+
+stripplot_clusters <- function(scaledQuantitativeValues, cluster){
+    v <- as.vector(unlist(cars.scaled[-8]))
+    y <- rep(c(1:ncol(scaledQuantitativeValues)), each=nrow(scaledQuantitativeValues))
+    xydata <- data.frame(v, y)
+    colors = rep(cluster, ncol(scaledQuantitativeValues))
+    xyplot(y ~ v, 
+           xydata, 
+           groups=colors,
+           main = paste("Distribution des variables de cars colorées par", 
+                        length(unique(cluster)),
+                        "classes"),
+           xlab = "Distributions",
+           ylab = "Index des variables de cars",
+           auto.key = list(space="top", x=0, y=0),
+           lattice.options = list(legend.bbox="panel"))
+}
+       
+stripplot_clusters(cars.scaled[-8], cars.cluster2$cluster)
+stripplot_clusters(cars.scaled[-8], cars.cluster3$cluster)
+stripplot_clusters(cars.scaled[-8], cars.cluster4$cluster)
+```
+
+On peut voir sur ces différents graphiques les classes se séparer clairement.
+On remarque que les variables corrélées voient la distributions de leurs classes être similaires, ce qui était prévisibles.
+Dans la même idée, on observe que les distributions des classes sont en miroir lorsque qu'on regarde deux variables anti-corrélées.
+Ces points sont tous cohérents avec les interprétations données dans la section *4.2 Corrélations*.
+**[Vérifier section]**
+
+Un point intéressant à noter est que la séparation des classes est plus prononcés pour certaines variables que pour d'autres.
+Par exemple, la variable `weightlbs` (index 5) a dans les trois cas des classes parfaitement séparées.
+Au contraire, `cubicinches` (index 1) voit la distribution de ses classes moins distincte.
+
+En addition à cela, on peut comparer ces classes à la classe explicitement définie par le jeu de données : la variable `brand`.
+
+```{r stripplots-brand}
+stripplot_clusters(cars.scaled[-8], cars$brand)
+```
+
+Les voitures américaines prennent bien entendu la plus grande part des individus (voir section 4.1.2)
+
+Faire le parallèle avec les classes
+
+### 5.3 Classification Ascendante Hiérarchique (CAH)
 
 Avant de commencer à travailler sur le jeu de données avec l'algorithme de la classification ascendante hiérarchique, il est important de noter que le nombre d'individus du jeu de données (261) est conséquent pour cet algorithme.
-Cela signifie que le dendrogramme résultant de la CAH comportera 261 feuilles ; la visualisation sera difficilement lisible et ce problème doit être abordé.
+Cela signifie que le dendrogramme résultant de la CAH comportera 261 feuilles ; la visualisation sera difficilement lisible et interprétable.
+Ce problème doit donc être abordé.
 
 ```{r cah, out.width="500px", fig.align='center', echo=FALSE}
 library(cluster)
