@@ -354,6 +354,7 @@ Voici maintenant une visualisation de ces partitionnement couplés aux distribut
 library(lattice)
 library(gridExtra)
 
+#TODO: ajouter doc
 stripplot_clusters <- function(scaledQuantitativeValues, cluster){
     v <- as.vector(unlist(cars.scaled[-8]))
     y <- rep(c(1:ncol(scaledQuantitativeValues)), each=nrow(scaledQuantitativeValues))
@@ -400,7 +401,9 @@ Faire le parallèle avec les classes
 
 Avant de commencer à travailler sur le jeu de données avec l'algorithme de la classification ascendante hiérarchique, il est important de noter que le nombre d'individus du jeu de données (261) est conséquent pour cet algorithme.
 Cela signifie que le dendrogramme résultant de la CAH comportera 261 feuilles ; la visualisation sera difficilement lisible et interprétable.
-Ce problème doit donc être abordé.
+Ce problème doit donc être abordé préalablement à l'exécution d'une CAH.
+
+Utiliser les parangons résultants d'une CAH à 50 ou 100 classes, puis les labelliser avec leur numéro de ligne + Brand
 
 ```{r cah, out.width="500px", fig.align='center', echo=FALSE}
 library(cluster)
