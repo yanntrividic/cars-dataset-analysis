@@ -239,6 +239,7 @@ Cette surréprésentation des voitures américaines sera à prendre en compte to
 
 ```{r table-contingence-brand}
 # TODO: Ajouter la table de contingence en fonction de brand et interpréter les résultats
+contingency_table
 ```
 
 ### 4.2 Corrélations
@@ -355,6 +356,10 @@ library(lattice)
 library(gridExtra)
 
 #TODO: ajouter doc
+#' Fonction permettant d'afficher un graphique "scatterplot" de distribution des variables
+#' 
+#' @param scaledQuantitativeValues dataframe ne comportant que des valeurs quantitatives
+#' @param cluster K-moyennes pour partitionné en plusieurs classes
 stripplot_clusters <- function(scaledQuantitativeValues, cluster){
     v <- as.vector(unlist(cars.scaled[-8]))
     y <- rep(c(1:ncol(scaledQuantitativeValues)), each=nrow(scaledQuantitativeValues))
