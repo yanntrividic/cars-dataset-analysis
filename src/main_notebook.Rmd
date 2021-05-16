@@ -161,7 +161,7 @@ On peut noter que les unités de mesure associées aux différentes variables so
 
 ```{r normalisation}
 cars$brand = as.factor(cars$brand) # Transformation en factor
-cars.scaled = as.data.frame(cbind(scale(cars[-8]), cars$brand)) # On garde les données textuelles tel quel
+cars.scaled = as.data.frame(cbind(scale(cars[-8]), cars$brand))
 ```
 
 ## 4. Analyse univariée
@@ -172,8 +172,10 @@ cars.scaled = as.data.frame(cbind(scale(cars[-8]), cars$brand)) # On garde les d
 
 Grâce à la fonction `summary`, nous avons un aperçu global des différentes distributions des variables composant notre base de données en calculant des statistiques de base (critères de position et critères de dispersion).
 Pour les variables quantitatives, `summary` nous retourne le minimum, le maximum, la moyenne et les trois quartiles.
+**[Yann : ajouter l'interprétation des résultats de summary, potentiellement le faire avec la fonction psych::describe pour être plus précis]**
 
 ```{r summary}
+psych::describe(cars[-8])
 summary(cars[-8]) # the last column is not included as it is a textual variable
 ```
 
@@ -227,20 +229,44 @@ library(dplyr)
 
 contingency_table <- table(cars$brand) 
 df <- data.frame(brand = names(contingency_table),
-                 Distribution = as.vector(contingency_table))
+                 Occurrences = as.vector(contingency_table))
 
-ggplot(df, aes(x = "", y = Distribution, fill = brand)) +
+ggplot(df, aes(x = "", y = Occurrences, fill = brand)) +
     geom_bar(width = 1, stat = "identity", color = "white") +
     coord_polar("y", start = 0)
+
+prop.table(contingency_table)
 ```
 
-Comme on peut le voir, la distribution des individus en fonction de la variable brand est tout sauf uniforme : près de deux tiers sont des voitures américaines tandis que les voitures japonaises et européennes se partagent de manière à peu près égale le dernier tiers des données.
+Comme on peut le voir, la distribution des individus en fonction de la variable brand est tout sauf uniforme : près de deux tiers sont des voitures américaines (62 %) tandis que les voitures japonaises et européennes se partagent de manière à peu près égale le dernier tiers des données, soit respectivement environ 20 et 18 %.
 Cette surréprésentation des voitures américaines sera à prendre en compte tout au long de l'analyse.
 
-```{r table-contingence-brand}
-# TODO: Ajouter la table de contingence en fonction de brand et interpréter les résultats
-contingency_table
+Il nous est aussi possible de résumer les différentes distributions des variables en fonction des valeurs de `brand`.
+
+```{r variables-summary-by-brand}
+lapply(split(cars[-8], cars$brand), summary)
+lapply(split(cars[-8], cars$brand), psych::describe)
 ```
+
+Le résultat obtenu nous permet d'avoir une idée claire des différences de distribution des valeurs en fonction de `brand`.
+On peut voir notamment une hiérarchie entre les provenances des voiture et leur consommation en carburant : en règle générale, une voiture japonaise consommera moins qu'une européenne, qui elle-même consommera moins qu'une américaine.
+
+D'autres interprétations peuvent être effectuées à partir de ces sommaires :
+
+-   Les moteurs des voitures japonaises et européennes ont généralement moins de cylindres que ceux des américaines.
+    La majorité des voitures européennes et japonaises auront quatre cylindres, tandis que l'écart-type est plus important pour les voitures amércaines ($\sigma=1,62$).
+
+-   Le volume des moteurs des voitures américaines est en moyenne beaucoup plus important que celles des japonaises et des européennes.
+    On peut noter une différence d'un facteur $2,5$.
+
+-   Les voitures américaines sont beaucoup plus puissantes que les voitures européennes et japonaises en moyenne.
+
+-   Les voitures américaines sont en moyenne beaucoup plus lourdes que les voitures européennes, qui sont elles-même légèrement plus lourdes que les voitures japonaises.
+
+-   L'accélération des voitures américaines est globalement meilleure que celle des japonaise, qui elle-même est légèrement meilleure que celle des européennes.
+
+De manière générale, on voit que les voitures européennes ont des caractéristiques proches des voitures japonaises.
+Les voitures américaines sont quant à elles très différentes des deux autres catégories.
 
 ### 4.2 Corrélations
 
@@ -355,11 +381,12 @@ Voici maintenant une visualisation de ces partitionnement couplés aux distribut
 library(lattice)
 library(gridExtra)
 
-#TODO: ajouter doc
-#' Fonction permettant d'afficher un graphique "scatterplot" de distribution des variables
+#' Fonction permettant d'afficher une série de strip plots des variables d'un
+#' data.frame et de les colorer et fonction de classes.
 #' 
-#' @param scaledQuantitativeValues dataframe ne comportant que des valeurs quantitatives
-#' @param cluster K-moyennes pour partitionné en plusieurs classes
+#' @param scaledQuantitativeValues data.frame ne comportant que des valeurs 
+#' quantitatives normalisées
+#' @param cluster classes associées aux individus du data.frame
 stripplot_clusters <- function(scaledQuantitativeValues, cluster){
     v <- as.vector(unlist(cars.scaled[-8]))
     y <- rep(c(1:ncol(scaledQuantitativeValues)), each=nrow(scaledQuantitativeValues))
@@ -398,9 +425,37 @@ En addition à cela, on peut comparer ces classes à la classe explicitement dé
 stripplot_clusters(cars.scaled[-8], cars$brand)
 ```
 
-Les voitures américaines prennent bien entendu la plus grande part des individus (voir section 4.1.2)
+Les voitures américaines prennent bien entendu la plus grande part des individus (voir section *4.1.2 Variables qualitatives* **[Vérifier section]**).
+On remarque que les voitures américaines prennent presque systématiquement un côté du spectre des valeurs, tandis que les japonaises et les européennes se partagent la seconde extrémité de manière plus ou moins distincte selon les variables.
 
-Faire le parallèle avec les classes
+En regardant conjointement la distribution des variables colorées par le résultat de K-moyennes à trois classes et ce dernier graphique, on peut tenter d'assimiler les classes obtenues avec K-moyennes avec les valeurs de `brand` dans une table de contingence :
+
+```{r contingency-table-brand-cluster3}
+afficher_table_contingence_clusters = function(factor, cluster){
+    cat("Valeurs absolues :","\n")
+    print(rbind(table(factor, cluster), 
+                tot=table(cluster)))
+    
+    cat("\n","Valeurs relatives :","\n")
+    print(rbind(prop.table(table(factor, cluster)), 
+                tot=prop.table(table(cluster)))*100)  
+}
+
+afficher_table_contingence_clusters(cars$brand, cars.cluster3$cluster)
+
+```
+
+En observant les résultat d'une table de contingence correspondant à cette hypothèse, cette dernière s'en voit invalidée ; les résultats ne soutiennent pas l'idée que les classes trouvées correspondraient parfaitement aux valeurs de `brand`.
+En effet, la première classe contient autant de voiture américaines que japonaises ou européennes malgré le fait qu'elle soit la plus importante des trois classes (46 % des individus).
+
+Cependant, il est à noter que cette même classe (la première) contient l'extrême majorité des voitures européennes et japonaises.
+De plus, elle contient une minorité des voitures américaines.
+
+Il pourrait donc être intéressant de voir si, en groupant les voitures européennes et japonaises, on obtient un meilleur partitionnement avec $k = 2$.
+
+```{r contingency-table-brand-cluster2}
+# TODO grouper les européennes et américaines, regarder ce que ça donne avec k = 2
+```
 
 ### 5.3 Classification Ascendante Hiérarchique (CAH)
 
