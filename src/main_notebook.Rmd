@@ -445,13 +445,16 @@ afficher_table_contingence_clusters(cars$brand, cars.cluster3$cluster)
 
 ```
 
-En observant les résultat d'une table de contingence correspondant à cette hypothèse, cette dernière s'en voit invalidée ; les résultats ne soutiennent pas l'idée que les classes trouvées correspondraient parfaitement aux valeurs de `brand`.
+En observant les résultat d'une table de contingence correspondant à cette hypothèse, cette dernière s'en voit invalidée ; les résultats ne soutiennent pas l'idée que les classes trouvées correspondraient de manière acceptable aux valeurs de `brand`.
 En effet, la première classe contient autant de voiture américaines que japonaises ou européennes malgré le fait qu'elle soit la plus importante des trois classes (46 % des individus).
 
 Cependant, il est à noter que cette même classe (la première) contient l'extrême majorité des voitures européennes et japonaises.
 De plus, elle contient une minorité des voitures américaines.
+Remarquons aussi que la troisième classe ne contient qu'une seule voiture non-américaine tandis qu'elle contient 61 américaines.
+Une interprétation similaire, bien que moins prononcée, peut être faite sur la classe 2.
+Les classes 2 et 3 caractérisent relativement bien les voitures américaines.
 
-Il pourrait donc être intéressant de voir si, en groupant les voitures européennes et japonaises, on obtient un meilleur partitionnement avec $k = 2$.
+Il est donc intéressant maintenant de voir si, en groupant les voitures européennes et japonaises, on obtient un meilleur partitionnement avec $k = 2$.
 
 ```{r contingency-table-brand-cluster2}
 # TODO grouper les européennes et américaines, regarder ce que ça donne avec k = 2
