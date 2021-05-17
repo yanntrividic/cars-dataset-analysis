@@ -445,6 +445,8 @@ afficher_table_contingence_clusters(cars$brand, cars.cluster3$cluster)
 
 ```
 
+**[TODO: attention, il semblerait que les classes puissent être inversées d'une exécution à l'autre... Ce qui semble logique, instabilité de K-moyennes ---\> classes à rectifier la suite de la section]**
+
 En observant les résultat d'une table de contingence correspondant à cette hypothèse, cette dernière s'en voit invalidée ; les résultats ne soutiennent pas l'idée que les classes trouvées correspondraient de manière acceptable aux valeurs de `brand`.
 En effet, la première classe contient autant de voiture américaines que japonaises ou européennes malgré le fait qu'elle soit la plus importante des trois classes (46 % des individus).
 
@@ -465,7 +467,20 @@ afficher_table_contingence_clusters(cars.combined.brand, cars.cluster2$cluster)
 ```
 
 En comparant visuellement les résultats obtenus avec la fonction `stripplot_clusters` , on observe que même s'il y a une certaine correspondance entre les résultats obtenus, elle reste approximative.
-Cette même observation peut-être faire en lisant la table de contingence
+
+Cette même observation peut-être faite en lisant la table de contingence.
+On peut lire que plus de 95 % des voitures non américaines sont concentrées dans la classe 1.
+Cependant, les 95 voitures non américaines de la classe 1 ne représente que 60 % du nombre de voitures totales de la classe 1.
+En contrepartie, 60 % des voitures américaines sont dans la classe 2, et les 40 % restants étant dans la classe 1.
+
+La tendance est assez claire : si une voiture est non américaine, il y a de grandes chances pour qu'elle soit dans la classe 1.
+Cependant, les voitures américaines peuvent appartenir aux deux classes, bien que leur appartenance soit plus prononcées pour la classe 2.
+
+En conclusion, l'interprétation des résultats de l'algorithme des K-moyennes permet donc de soutenir l'hypothèse qu'il existe bel et bien des différences quantitatives entre les différentes marques de voitures, et que celles-ci peuvent être partitionner au moins en partie.
+Les différences les plus grandes sont entre les voitures américaines et les non américaines.
+Les voitures européennes et japonaises sont différenciable, mais dans une moindre mesure.
+Ces différences ne permettent cependant pas d'avoir un partitionnement clair et sans équivoque entre les marques à partir de l'algorithme des K-moyennes ; une part importante des voitures américaines est indifférenciée des voitures non américaines.
+Il faut donc continuer l'analyse.
 
 ### 5.3 Classification Ascendante Hiérarchique (CAH)
 
