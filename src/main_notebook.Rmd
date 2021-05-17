@@ -5,9 +5,9 @@ author:
 - Jacky Thay
 - Yann Trividic
 output:
+  pdf_document: default
   html_document:
     df_print: paged
-  pdf_document: default
 abstract: |
   This is the abstract.
   It consists of two paragraphs
@@ -457,8 +457,15 @@ Les classes 2 et 3 caractérisent relativement bien les voitures américaines.
 Il est donc intéressant maintenant de voir si, en groupant les voitures européennes et japonaises, on obtient un meilleur partitionnement avec $k = 2$.
 
 ```{r contingency-table-brand-cluster2}
-# TODO grouper les européennes et américaines, regarder ce que ça donne avec k = 2
+cars.combined.brand <- cars$brand
+levels(cars.combined.brand)[1:2] <- 'Non-US' # remplace Japon et Europe par Non-US
+
+stripplot_clusters(cars.scaled[-8], cars.combined.brand)
+afficher_table_contingence_clusters(cars.combined.brand, cars.cluster2$cluster)
 ```
+
+En comparant visuellement les résultats obtenus avec la fonction `stripplot_clusters` , on observe que même s'il y a une certaine correspondance entre les résultats obtenus, elle reste approximative.
+Cette même observation peut-être faire en lisant la table de contingence
 
 ### 5.3 Classification Ascendante Hiérarchique (CAH)
 
