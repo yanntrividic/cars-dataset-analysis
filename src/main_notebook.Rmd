@@ -175,6 +175,8 @@ Pour les variables quantitatives, `summary` nous retourne le minimum, le maximum
 **[Yann : ajouter l'interprétation des résultats de summary, potentiellement le faire avec la fonction psych::describe pour être plus précis]**
 
 ```{r summary}
+library(psych) # On appelle la librairie avant de l'utiliser
+
 psych::describe(cars[-8])
 summary(cars[-8]) # the last column is not included as it is a textual variable
 ```
