@@ -496,15 +496,35 @@ Utiliser les parangons résultants d'une CAH à 50 ou 100 classes, puis les labe
 library(cluster)
 ?agnes
 cah <- agnes(cars[, -8], diss=F, metric="euclidean", stand=T, method="ward")
-plot(cah)
-```
 
-*Sur le graphique des résultats changez les titres des axes x et y par `Individus` et `Seuil` et le titre du graphique par `Dendogramme`. Changez par la suite la couleur des titres par du rouge.*
-
-```{r q1-5, out.width = "500px", fig.align='center', echo=FALSE}
+#Sur le graphique des résultats changez les titres des axes x et y par `Individus` et `Seuil` et le titre du graphique par `Dendogramme`. Changez par la suite la couleur des titres par du rouge.*
 plot(cah, 
      xlab="Individus", ylab="Seuil", main="Dendogramme", 
      col.axis="red", col.main="red")
+```
+Afin d'améliorer la lisiblité, il est possible de découper un dendrogramme, sur le graphique précédent, on distingue quatre groupes pour les seuils <15, on va utiliser ces groupes pour créer notre découpage.
+
+```{r CAH découpage - matérialisation des groupes out.width="500px", fig.align='center', echo=FALSE}
+# Centrage réduction des données pour éviter que variables à forte variance pèsent indûment sur les résultats
+cars.cr= scale(cars[, -8],center=T,scale=T)
+# Matrice des distances entre individus
+d.cars= dist(cars.cr)
+# CAH - critère de Ward
+# method = « ward.D2 » correspond au vrai critère de Ward utilisant le carré de la distance
+cah.ward= hclust(d.cars,method="ward.D2")
+plot(cah.ward, xlab="Individus", ylab="Seuil", main="Dendogramme découpé", 
+     col.axis="blue", col.main="blue") # Affichage dendrogramme
+rect.hclust(cah.ward,k=4, border="blue") # Dendrogramme avec matérialisation des groupes
+groupes.cah= cutree(cah.ward,k=4) # Découpage en 4 groupes
+print(groupes.cah) # Liste des groupes
+
+# Version alternative avec librairie Factoextra
+library(factoextra)
+
+fviz_dend(cah.ward, k=4, xlab="Individus", ylab="Seuil", main="Dendogramme découpé (factoextra)", 
+     col.axis="blue", col.main="blue")
+
+
 ```
 
 ## 6. Analyse en composantes principales
