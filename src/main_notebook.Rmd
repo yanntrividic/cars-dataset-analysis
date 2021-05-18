@@ -502,7 +502,7 @@ plot(cah,
      xlab="Individus", ylab="Seuil", main="Dendogramme", 
      col.axis="red", col.main="red")
 ```
-Afin d'améliorer la lisiblité, il est possible de découper un dendrogramme, sur le graphique précédent, on distingue quatre groupes pour les seuils <15, on va utiliser ces groupes pour créer notre découpage.
+Afin d'améliorer la lisiblité, il est possible de découper un dendrogramme, sur le graphique précédent, on distingue grossièrement quatre groupes pour les seuils <15, on va utiliser ces groupes pour créer notre découpage.
 
 ```{r CAH découpage - matérialisation des groupes out.width="500px", fig.align='center', echo=FALSE}
 # Centrage réduction des données pour éviter que variables à forte variance pèsent indûment sur les résultats
@@ -521,10 +521,21 @@ print(groupes.cah) # Liste des groupes
 # Version alternative avec librairie Factoextra
 library(factoextra)
 
-fviz_dend(cah.ward, k=4, xlab="Individus", ylab="Seuil", main="Dendogramme découpé (factoextra)", 
-     col.axis="blue", col.main="blue")
+fviz_dend(cah, k=4, xlab="Individus", ylab="Seuil", main="Dendogramme découpé (factoextra)", 
+     col.axis="blue", col.main="blue", horiz = TRUE)
 
-
+dend_plot=fviz_dend(cah)
+dend_data=attr(dend_plot, "dendrogram")
+dend_cuts=cut(dend_data, h = 14 )
+p1=fviz_dend(dend_cuts$lower[[1]])
+p2=fviz_dend(dend_cuts$lower[[2]])
+p3=fviz_dend(dend_cuts$lower[[3]])
+p4=fviz_dend(dend_cuts$lower[[4]])
+plot(p1, main="p1")
+plot(p2, main="p2")
+plot(p3, main="p3")
+plot(p4, main="p4")
+gridExtra::grid.arrange(p1, p2, p3, p4, nrow = 2)
 ```
 
 ## 6. Analyse en composantes principales
