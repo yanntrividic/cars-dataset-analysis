@@ -514,13 +514,14 @@ plot(cars.hc.ward.inertia[1:20], type = "s",
 Avant même de s'intéresser au dendrogramme en lui-même, il est intéressant de visualiser son inertie.
 Ici, deux sauts se distinguent nettement.
 Les deux variations d'inertie les plus grandes sont à 2 classes et à 4 classes :
+**[Jack : je suppose que cah.ward.inertia = cars.hc.ward.inertia ? sinon le code ne se lançait pas]**
 
 ```{r hc-ward-inertia-critical-points}
 plot(cars.hc.ward.inertia[1:20], type = "s",
      xlab = "Nombre de classes", 
      ylab = "Inertie", 
      main = "Inertie du dendrogramme avec plus grands gains entourés")
-points(c(2, 4), cah.ward.inertia[c(2, 4)], col = c("green", "red"), cex = 2, lwd = 3)
+points(c(2, 4), cars.hc.ward.inertia[c(2, 4)], col = c("green", "red"), cex = 2, lwd = 3)
 ```
 
 ```{r hc-ward-partitions}
@@ -587,6 +588,7 @@ Etant donné que seule la classe 2 présente des résultats peu concluant, il es
 
 On recommence donc le même procédé avec uniquement les individus de la classe 2 (**voir annexe**).
 **[Yann : à mettre la partie ci-dessous en annexe]**
+**[Jack : la ligne cars.hc.ward.cut4.tree2.ind <- as.numeric(names(cutree(cars.hc.ward.cut4.tree2, k=1))) me donne 'tree' incorrect (composante 'merge'), j'ai éssayé de corriger mais j'ai pas trouvé]**
 
 ```{r hc-ward-subclass}
 # le sous-arbre de la classe 2 est extrait
@@ -693,7 +695,7 @@ summary(cars.pca)
 On obtient alors 7 composantes principales allant de `PC1` à `PC7`.
 
 Dans ces résultats, la première composante `PC1` présente une forte association positive avec la variable `mpg`, elle est cependant moins importante avec `time.to.60` et `year`.
-En ce qui concerne les variables restantes, les associaitions sont négatives.
+En ce qui concerne les variables restantes, les associations sont négatives.
 [**TODO: ajouter des valeurs]**
 
 Le tableau des valeurs propres est un outil permettant de déterminer quels sont les axes à prendre en compte pour l'ACP.
