@@ -148,7 +148,8 @@ cars[rowSums(is.na(cars)) > 0,] # counts the number of rows with NA values
 ```
 
 ```{r}
-#le = LabelEncoder().fit(cars['brand']) # TODO: à quoi ça sert ça ?
+#le = LabelEncoder().fit(cars['brand'])
+# TODO: à quoi ça sert ça ?
 ```
 
 Le jeu de données ne contient aucune valeur manquante, il peut donc être utilisé tel quel pour la suite de l'analyse.
@@ -501,10 +502,10 @@ Le critère du lien minimum et celui du lien maximum sont utilisés dans la sect
 cars.dist = dist(cars.scaled[-8]) # matrice des distances euclidiennes entre individus
 
 # method = « ward.D2 » correspond au vrai critère de Ward utilisant le carré de la distance
-cars.cah.ward = hclust(cars.dist, method="ward.D2")
-cars.cah.ward.inertia = sort(cars.cah.ward$height, decreasing = T)
+cars.hc.ward = hclust(cars.dist, method="ward.D2")
+cars.hc.ward.inertia = sort(cars.hc.ward$height, decreasing = T)
 
-plot(cars.cah.ward.inertia[1:20], type = "s", 
+plot(cars.hc.ward.inertia[1:20], type = "s", 
      xlab = "Nombre de classes", 
      ylab = "Inertie", 
      main = "Inertie du dendrogramme en fonction du nombre de classes")
@@ -515,7 +516,7 @@ Ici, deux sauts se distinguent nettement.
 Les deux variations d'inertie les plus grandes sont à 2 classes et à 4 classes :
 
 ```{r hc-ward-inertia-critical-points}
-plot(cars.cah.ward.inertia[1:20], type = "s",
+plot(cars.hc.ward.inertia[1:20], type = "s",
      xlab = "Nombre de classes", 
      ylab = "Inertie", 
      main = "Inertie du dendrogramme avec plus grands gains entourés")
@@ -524,25 +525,28 @@ points(c(2, 4), cah.ward.inertia[c(2, 4)], col = c("green", "red"), cex = 2, lwd
 
 ```{r hc-ward-partitions}
 par(mar=c(1,4.5,2,0))
-plot(cars.cah.ward, labels = FALSE, main = "Partitions en 2 ou 4 classes", xlab = "", ylab = "Hauteur", sub = "", hang = -1)
-rect.hclust(cars.cah.ward, 2, border = "green")
-rect.hclust(cars.cah.ward, 4, border = "red")
+plot(cars.hc.ward, labels = FALSE, 
+     main = "Partitions en 2 ou 4 classes", 
+     ylab = "Hauteur", 
+     hang = -1)
+rect.hclust(cars.hc.ward, 2, border = "green")
+rect.hclust(cars.hc.ward, 4, border = "red")
 ```
 
 Encore une fois, comme avec K-moyennes, il pourrait être intéressant d'interpréter les résultats de la table de contingence entre `brand` et les classes résultant de la CAH, ce paramètre n'entrant pas en compte dans le calcul de la matrice de dissimilarité.
 Pour ce faire, on utilise la fonction `afficher_table_contingence_clusters` :
 
 ```{r hc-ward-contingency-tables}
-cut_affiche_table_contingence = function(cah_result, cut_vector, factor){
+cut_affiche_table_contingence = function(hc_result, cut_vector, factor){
     for(cut in cut_vector){
         cat(paste("\nCut =", cut, "\n"))
-        c = cutree(cah_result, cut)
+        c = cutree(hc_result, cut)
         afficher_table_contingence_clusters(factor, c)
     }
 }
 
 # on coupe au niveau 4 et affichons les tables de contingences
-cut_affiche_table_contingence(cars.cah.ward, c(2, 4), cars$brand) 
+cut_affiche_table_contingence(cars.hc.ward, c(2, 4), cars$brand) 
 ```
 
 Pour le partionnement à deux classes, on peut observer que 100 % des voitures non américaines sont contenues dans la classe 2.
@@ -559,7 +563,7 @@ Pour le partitionnement à quatre classes, on remarque que les voitures europée
 Voici le résultat obtenu lorsque l'on décide de les regrouper :
 
 ```{r hc-ward-contingency-table-combined-brands}
-cut_affiche_table_contingence(cars.cah.ward, 4, cars.combined.brand)
+cut_affiche_table_contingence(cars.hc.ward, 4, cars.combined.brand)
 ```
 
 Comme avec le partionnement à deux classes, on observe qu'il existe une classe seulement constituées de voitures américaines (il s'agit rigoureusement de la même classe, voir le dendrogramme), et les autres constituées d'un mélange de voitures américaines et non américaines.
@@ -575,6 +579,10 @@ Le partitionnement à quatre classe est donc un meilleur partititionnement que c
 Celui-ci est globalement plus fin pour différencier les voitures américaines des non américaines.
 Ce partitionnement surclasse aussi de loin tous les résultats obtenus avec l'algorithme des K-moyennes.
 
+```{r hc-ward-cluster4}
+cars.hc.ward.cluster4 <- cutree(cars.hc.ward, 4)
+```
+
 Etant donné que seule la classe 2 présente des résultats peu concluant, il est intéressant de vérifier la structure de l'arbre qui la constitue pour peut-être la diviser en sous-classes.
 
 On recommence donc le même procédé avec uniquement les individus de la classe 2 (**voir annexe**).
@@ -582,11 +590,11 @@ On recommence donc le même procédé avec uniquement les individus de la classe
 
 ```{r hc-ward-subclass}
 # le sous-arbre de la classe 2 est extrait
-cars.cah.ward.cut4.tree2 <- cut(as.dendrogram(cars.cah.ward), h = 13)$lower[[3]]
+cars.hc.ward.cut4.tree2 <- cut(as.dendrogram(cars.hc.ward), h = 13)$lower[[3]]
 # puis on extrait les indices
-cars.cah.ward.cut4.tree2.ind <- as.numeric(names(cutree(cars.cah.ward.cut4.tree2, k=1)))
+cars.hc.ward.cut4.tree2.ind <- as.numeric(names(cutree(cars.hc.ward.cut4.tree2, k=1)))
 
-dist = dist(cars.scaled[cars.cah.ward.cut4.tree2.ind, -8])
+dist = dist(cars.scaled[cars.hc.ward.cut4.tree2.ind, -8])
 cah.ward = hclust(dist, method="ward.D2")
 
 inertia = sort(cah.ward$height, decreasing = T)
@@ -611,156 +619,158 @@ rect.hclust(cah.ward, 3, border = "red")
 rect.hclust(cah.ward, 4, border = "blue")
 
 # affichage des tables de contingence
-cut_affiche_table_contingence(cah.ward, c(2, 3, 4), cars$brand[cars.cah.ward.cut4.tree2.ind])
+cut_affiche_table_contingence(cah.ward, c(2, 3, 4), cars$brand[cars.hc.ward.cut4.tree2.ind])
 
 # on remarque que le partitionnement en deux classes n'est pas suffisant, et que celui à quatre
 # classes est trop. On remarque aussi que la distinction europe-japon est faible.
 
 # combinaison des marques pour le partionnement en 3 classes :
-afficher_table_contingence_clusters(cars.combined.brand[cars.cah.ward.cut4.tree2.ind], cah.ward.cut3)
+afficher_table_contingence_clusters(cars.combined.brand[cars.hc.ward.cut4.tree2.ind], cah.ward.cut3)
 ```
 
 Bien que le partionnement en trois sous-classes puisse affiner les résultats de la classification au sein de la classe 2, cet affinage est trop faible pour mériter l'ajout de trois nouvelles classes.
 
 #### 5.3.2 Critères du lien minimum et du lien maximum
 
-##### 5.3.2.1 Minimum
-
 De la même manière, nous allons visualiser l'inertie avant le dendrogramme
 
 ```{r hc-single-link}
-cars.cah.min = hclust(cars.dist, method="single")
+cars.hc.min = hclust(cars.dist, method="single")
 par(mar=c(1,4.5,2,0))
-plot(cars.cah.min, labels = FALSE, main = "Dendrogramme suite à la CAH avec lien minimum", xlab = "", ylab = "Hauteur", sub = "", hang = -1)
+plot(cars.hc.min, labels = FALSE, main = "Dendrogramme suite à la CAH avec lien minimum", xlab = "", ylab = "Hauteur", sub = "", hang = -1)
 ```
 
-```{r hc-complete}
-cars.cah.max = hclust(cars.dist, method="complete")
+```{r hc-complete-link}
+cars.hc.max = hclust(cars.dist, method="complete")
 par(mar=c(1,4.5,2,0))
-plot(cars.cah.max, labels = FALSE, main = "Dendrogramme suite à la CAH avec lien maximum", xlab = "", ylab = "Hauteur", sub = "", hang = -1)
+plot(cars.hc.max, labels = FALSE, main = "Dendrogramme suite à la CAH avec lien maximum", xlab = "", ylab = "Hauteur", sub = "", hang = -1)
 
-cars.cah.max.inertia = sort(cars.cah.max$height, decreasing = T)
+cars.hc.max.inertia = sort(cars.hc.max$height, decreasing = T)
 
-plot(cars.cah.max.inertia[1:20], type = "s", 
+plot(cars.hc.max.inertia[1:20], type = "s", 
      xlab = "Nombre de classes", 
      ylab = "Inertie", 
      main = "Inertie du dendrogramme en fonction du nombre de classes")
 
 # On remarque des points d'intérêt à 2, 3 et 4
-plot(cars.cah.max.inertia[1:20], type = "s",
+plot(cars.hc.max.inertia[1:20], type = "s",
      xlab = "Nombre de classes", 
      ylab = "Inertie", 
      main = "Inertie du dendrogramme avec plus grands gains entourés")
-points(c(2, 3, 4, 5), cars.cah.max.inertia[c(2, 3, 4, 5)], col = c("green", "red", "blue", "orange"), cex = 2, lwd = 3)
+points(c(2, 3, 4, 5), cars.hc.max.inertia[c(2, 3, 4, 5)], col = c("green", "red", "blue", "orange"), cex = 2, lwd = 3)
 
 # affichage
 par(mar=c(1,4.5,2,0))
-plot(cars.cah.max, labels = FALSE, main = "Partitions en 2, 3, 4 ou 5 classes", xlab = "", ylab = "Hauteur", sub = "", hang = -1)
-rect.hclust(cars.cah.max, 2, border = "green")
-rect.hclust(cars.cah.max, 3, border = "red")
-rect.hclust(cars.cah.max, 4, border = "blue")
-rect.hclust(cars.cah.max, 5, border = "orange")
+plot(cars.hc.max, labels = FALSE, main = "Partitions en 2, 3, 4 ou 5 classes", xlab = "", ylab = "Hauteur", sub = "", hang = -1)
+rect.hclust(cars.hc.max, 2, border = "green")
+rect.hclust(cars.hc.max, 3, border = "red")
+rect.hclust(cars.hc.max, 4, border = "blue")
+rect.hclust(cars.hc.max, 5, border = "orange")
 
 # affichage des tables de contingence
-cut_affiche_table_contingence(cars.cah.max, c(2, 3, 4, 5), cars$brand)
+cut_affiche_table_contingence(cars.hc.max, c(2, 3, 4, 5), cars$brand)
 # TODO: interpreter
 ```
 
 ## 6. Analyse en composantes principales pour interpréter les classes
 
-*Analysez la fonction `catdes()`. Utilisez cette fonction par rapport à la 14e variable du jeu de données `decathlon`.*
+Grâce à l'ACP, nous tenons compte des liaisons entre les variables.
+**[TODO : c'est pas très précis comme définition, jusqu'à présent, tout ce qu'on a fait ou presque tient compte des liaisons entre les variables]**
 
-Grêce à l'ACP, nous tenons compte des liaisons entre les variables.
-
-```{r q1-8-2 out.width="500px", fig.align='center', echo=FALSE}
-
+```{r pca}
 library("FactoMineR")
 library("factoextra")
 # paramètres à ajuster
 #catdes(cars[, c(1:8)], 8)
-#CPA marche mieux avec des variables quantitatives
+
+# TODO: changer pour PCA
 cars.pca <- prcomp(cars[c(1:7)], center = TRUE,scale. = TRUE)
 cars.pca
 summary(cars.pca)
-
-
+?prcomp
 ```
 
-On obtient alors 7 composantes principales allant de PC1 à PC7.
+On obtient alors 7 composantes principales allant de `PC1` à `PC7`.
 
-Dans ces résultats , la première composante (PC1) présente une forte association positive avec la variable "mpg", elle est cependant moins importante avec "tme.to.60" et "year".
-En ce qui concerne les variables restantes , les associaitions sont négatives .
+Dans ces résultats, la première composante `PC1` présente une forte association positive avec la variable `mpg`, elle est cependant moins importante avec `time.to.60` et `year`.
+En ce qui concerne les variables restantes, les associaitions sont négatives.
+[**TODO: ajouter des valeurs]**
 
-Le tableau des valeurs propres est un outil permettant de déterminer quels axes à prendre en compte pour l'ACP.
-Il est important que les valeurs propres des axes retenus restituent une "bonne proportion" de l'analyse.
-Cela signifie que la somme de l'inertie expliquée par chacun des axes ("Proportion of variance") représente une partie importante de l'inertie totale.
-C'est pour cette raison que nous allons retenir PC1 et PC2 qui présentent, respectivement, et 72 et 13 % d'inertie , soit un total 85%.
-Elles regroupent 85% d'information du jeu d'origine.
+Le tableau des valeurs propres est un outil permettant de déterminer quels sont les axes à prendre en compte pour l'ACP.
+Il est important que les valeurs propres des axes retenus restituent une part importante de la variance totale du jeu de données.
+Cela signifie que la somme de l'inertie expliquée par chacun des axes représente une partie importante de l'inertie totale.
+C'est pour cette raison que nous allons retenir `PC1` et `PC2`, représentant respectivement 72 et 13 % d'inertie, pour un total de 85 % d'inertie.
+On peut dire que ces deux axes restituent 85 % des informations du jeu de données d'origine.
 
-Cette somme est une mesure de la fiabilité de la lecture des mappings, et donc de la qualité globale explicative de l'analyse.
+Cette somme est une mesure de la fiabilité de la lecture des mappings **[TODO: définir lecture des mappings, perso je vois pas ce que tu veux dire]**, et donc de la qualité globale explicative de l'analyse.
 
 Nous allons réaliser une représentation graphique de notre ACP, nous utilserons un biplot pour cela.
 
-```{r plotting ACP}
+```{r pca-plot}
 fviz_pca_var(cars.pca, col.var = "black")
-cars.pca <- PCA(cars[c(1:7)], scale.unit = TRUE, ncp = 2, graph =FALSE)
+cars.pca <- PCA(cars.scaled[-8], scale.unit=F, ncp = 2, graph = F)
 #cars: jeu de données de type data frame. Les lignes sont des individus et les colonnes sont des variables numériques
 #scale.unit: une valeur logique. Si TRUE, les données sont standardisées/normalisées avant l’analyse.
 #ncp: nombre de dimensions conservées dans les résultats finaux.
 #graph: une valeur logique. Si TRUE un graphique est affiché.
 ```
 
-\#\#[TODO avec CAH :Réalisez une ACP sur les résultats obtenus à l'aide de la CAH.
-Coloriez les résultats de l'ACP en fonction d'une variable]\#\#
+**[TODO avec CAH : Réalisez une ACP sur les résultats obtenus à l'aide de la CAH. Coloriez les résultats de l'ACP en fonction d'une variable -\> Yann : pour colorer, prendre la variable cars.hc.ward.cluster4]**
 
-Le graphique nous montre que sur les 7 variables représentées, 6 sont corrélées avec Dim1, une observation cohérente puisque cette composante a une inertie de 72% dans l'ensemble du data set.
-Parmis les variables corrélées négativement nous trouvons : time.to.60(temps nécesssaire pour aller de 0 à 60 mph) et mpg (distance parcourue avec un gallon d'essence).
-Elle mesure donc principalement la capacité d'accélération du véhicule.
-Parmi les variables corrélées positivement nous avons : hp, cylinders, cubicinches et weight.
+Le graphique nous montre que sur les sept variables représentées, six sont corrélées avec `Dim1`, une observation cohérente puisque cette composante a une inertie de 72 % dans l'ensemble du data set.
+Parmi les variables corrélées négativement avec `Dim1` nous trouvons `time.to.60` et `mpg`.
+Elle mesure donc principalement la capacité d'accélération du véhicule **[TODO : ce n'est pas vrai, c'est le contraire d'ailleurs. time.to.60 est la variable la moins corrélée avec Dim1 parmi les 6. A remplacer par un truc du genre "Elle mesure donc principalement le gabarit du véhicule et du moteur, ainsi que sa puissance"]**
 
-Pour Dim2, l'unique variable qui lui est corrélée est year , et elle est corrélée de façon positive
+Parmi les variables corrélées positivement avec `Dim1` nous avons les variables `hp`, `cylinders`, `cubicinches` et `weightlbs`.
+**[TODO: ajouter les valeurs de ces corrélations].**
 
-L'ensemble des variables se trouvent relativement loin de l'origine, elles sont donc bien représentés par l'ACP.
-Nous pouvons vérifier cela en visualisant le cos2 des variables sur toutes les dimensions en utilisant le package corrplot
+Pour `Dim2`, l'unique variable qui lui est corrélée est `year`, et elle est corrélée de façon positive.
+[**TODO : pas si on regarde les résultats de prcomp]**.
 
-```{r ACP qualité de représentation }
+L'ensemble des variables se trouvent relativement loin de l'origine, elles sont donc bien représentées par l'ACP.
+Nous pouvons vérifier cela en visualisant le carré du cosinus des variables sur toutes les dimensions en utilisant la bibliothèque `corrplot`.
+**[TODO : j'ai l'impression que c'est juste une manière de tourner différemment tes interprétations précédentes à partir des mêmes données, je suis pas sûr que ce soit utile]**
 
+```{r pca-representation-quality}
 var <- get_pca_var(cars.pca)
 #cosinus carrées des variables 
 head(var$cos2, 4)
 library("corrplot")
 corrplot(var$cos2, is.corr=FALSE)
+
 # Cos2 total des variables sur Dim.1 et Dim.2
 fviz_cos2(cars.pca, choice = "var", axes = 1:2)
-
 ```
 
 ## 7. Classification hiérarchique sur composantes principales
 
-Il faut tout d'abord réaliser l'ACM du tableau de données
+```{r hcpc}
+print(cars.pca)
+cars.hcpc <- HCPC(cars.pca, nb.clust = -1, consol=T, iter.max=50, 
+                  min = 3, 
+                  metric = "euclidean", method = "ward", 
+                  graph=T)
 
-```{r HCPC }
-cars.pca <- PCA(cars[c(1:7)],scale. = TRUE)
-cars.hcpc=HCPC(cars.pca,graph=TRUE)
 #cars.hcpc = HCPC(cars.pca)
 #HCPC(cars, nb.clust = 0, graph = TRUE)
 ```
 
-```{r visualisation de l'HCPC}
+```{r hpcp}
 fviz_dend(cars.hcpc, 
           cex = 0.7,                     # Taille du text
           palette = "jco",               # Palette de couleur ?ggpubr::ggpar
           rect = TRUE, rect_fill = TRUE, # Rectangle autour des groupes
           rect_border = "jco",           # Couleur du rectangle
-          labels_track_height = 0.8      # Augment l'espace pour le texte
+          labels_track_height = 0.8      # Augment l'espace pour le texte en 3D
           )
-
-#en 3d
+# TODO: en l'état, on voit pas grand chose, y aurait p't'être moyen d'améliorer ça ? J'ai 
+# cherché comment enlever les labels mais j'ai pas trouvé (un peu comme dans celui du
+# chunk hc-ward-partitions)
 ```
 
 Le dendogramme suggère une solution à 3 groupes, on peut également les visualiser sur l'ACP
 
-```{r Hcpc  visualisation}
+```{r hpcp-viz}
 fviz_cluster(cars.hcpc,
              repel = TRUE,            # Evite le chevauchement des textes
              show.clust.cent = TRUE, # Montre le centre des clusters
@@ -770,4 +780,7 @@ fviz_cluster(cars.hcpc,
              )
 ```
 
-\`\`\`{r HCPC classification hiérarchique et le plan des facteurs} \# Principal components + tree plot(cars.hcpc, choice = "3D.map")
+```{r}
+# Principal components + tree 
+plot(cars.hcpc, choice = "3D.map")
+```
