@@ -175,6 +175,8 @@ Pour les variables quantitatives, `summary` nous retourne le minimum, le maximum
 **[Yann : ajouter l'interprétation des résultats de summary, potentiellement le faire avec la fonction psych::describe pour être plus précis]**
 
 ```{r summary}
+library(psych) # On appelle la librairie avant de l'utiliser
+
 psych::describe(cars[-8])
 summary(cars[-8]) # the last column is not included as it is a textual variable
 ```
@@ -446,6 +448,8 @@ afficher_table_contingence_clusters(cars$brand, cars.cluster3$cluster)
 
 ```
 
+**[TODO: attention, il semblerait que les classes puissent être inversées d'une exécution à l'autre... Ce qui semble logique, instabilité de K-moyennes ---\> classes à rectifier la suite de la section]**
+
 En observant les résultat d'une table de contingence correspondant à cette hypothèse, cette dernière s'en voit invalidée ; les résultats ne soutiennent pas l'idée que les classes trouvées correspondraient de manière acceptable aux valeurs de `brand`.
 En effet, la première classe contient autant de voiture américaines que japonaises ou européennes malgré le fait qu'elle soit la plus importante des trois classes (46 % des individus).
 
@@ -466,7 +470,24 @@ afficher_table_contingence_clusters(cars.combined.brand, cars.cluster2$cluster)
 ```
 
 En comparant visuellement les résultats obtenus avec la fonction `stripplot_clusters` , on observe que même s'il y a une certaine correspondance entre les résultats obtenus, elle reste approximative.
+<<<<<<< HEAD
 Cette même observation peut-être faire en lisant la table de contingence
+=======
+
+Cette même observation peut-être faite en lisant la table de contingence.
+On peut lire que plus de 95 % des voitures non américaines sont concentrées dans la classe 1.
+Cependant, les 95 voitures non américaines de la classe 1 ne représente que 60 % du nombre de voitures totales de la classe 1.
+En contrepartie, 60 % des voitures américaines sont dans la classe 2, et les 40 % restants étant dans la classe 1.
+
+La tendance est assez claire : si une voiture est non américaine, il y a de grandes chances pour qu'elle soit dans la classe 1.
+Cependant, les voitures américaines peuvent appartenir aux deux classes, bien que leur appartenance soit plus prononcées pour la classe 2.
+
+En conclusion, l'interprétation des résultats de l'algorithme des K-moyennes permet donc de soutenir l'hypothèse qu'il existe bel et bien des différences quantitatives entre les différentes marques de voitures, et que celles-ci peuvent être partitionner au moins en partie.
+Les différences les plus grandes sont entre les voitures américaines et les non américaines.
+Les voitures européennes et japonaises sont différenciable, mais dans une moindre mesure.
+Ces différences ne permettent cependant pas d'avoir un partitionnement clair et sans équivoque entre les marques à partir de l'algorithme des K-moyennes ; une part importante des voitures américaines est indifférenciée des voitures non américaines.
+Il faut donc continuer l'analyse.
+>>>>>>> bde8d0dcb7dc212cf58ed1e2c0075193935fad37
 
 ### 5.3 Classification Ascendante Hiérarchique (CAH)
 
@@ -480,16 +501,13 @@ Utiliser les parangons résultants d'une CAH à 50 ou 100 classes, puis les labe
 library(cluster)
 ?agnes
 cah <- agnes(cars[, -8], diss=F, metric="euclidean", stand=T, method="ward")
-plot(cah)
-```
 
-*Sur le graphique des résultats changez les titres des axes x et y par `Individus` et `Seuil` et le titre du graphique par `Dendogramme`. Changez par la suite la couleur des titres par du rouge.*
-
-```{r q1-5, out.width = "500px", fig.align='center', echo=FALSE}
+#Sur le graphique des résultats changez les titres des axes x et y par `Individus` et `Seuil` et le titre du graphique par `Dendogramme`. Changez par la suite la couleur des titres par du rouge.*
 plot(cah, 
      xlab="Individus", ylab="Seuil", main="Dendogramme", 
      col.axis="red", col.main="red")
 ```
+<<<<<<< HEAD
 Il est également possible de "couper" un dendrogramme au niveau de seuil spécifique pour avoir plus de clarté. On s'aperçoit également qu'il est possible de diviser ce graphique en quatre groupes.
 ```{r CAH découpage - matérialisation des groupes out.width="500px", fig.align='center', echo=FALSE}
 
@@ -514,6 +532,43 @@ print(groupes.cah)
 
 ```
 ##[dire dans quels groupes appartiennent les véhicules , j'ai un doute au niveau de l'interprétation ]
+=======
+Afin d'améliorer la lisiblité, il est possible de découper un dendrogramme, sur le graphique précédent, on distingue grossièrement quatre groupes pour les seuils <15, on va utiliser ces groupes pour créer notre découpage.
+
+```{r CAH découpage - matérialisation des groupes out.width="500px", fig.align='center', echo=FALSE}
+# Centrage réduction des données pour éviter que variables à forte variance pèsent indûment sur les résultats
+cars.cr= scale(cars[, -8],center=T,scale=T)
+# Matrice des distances entre individus
+d.cars= dist(cars.cr)
+# CAH - critère de Ward
+# method = « ward.D2 » correspond au vrai critère de Ward utilisant le carré de la distance
+cah.ward= hclust(d.cars,method="ward.D2")
+plot(cah.ward, xlab="Individus", ylab="Seuil", main="Dendogramme découpé", 
+     col.axis="blue", col.main="blue") # Affichage dendrogramme
+rect.hclust(cah.ward,k=4, border="blue") # Dendrogramme avec matérialisation des groupes
+groupes.cah= cutree(cah.ward,k=4) # Découpage en 4 groupes
+print(groupes.cah) # Liste des groupes
+
+# Version alternative avec librairie Factoextra
+library(factoextra)
+
+fviz_dend(cah, k=4, xlab="Individus", ylab="Seuil", main="Dendogramme découpé (factoextra)", 
+     col.axis="blue", col.main="blue", horiz = TRUE)
+
+dend_plot=fviz_dend(cah)
+dend_data=attr(dend_plot, "dendrogram")
+dend_cuts=cut(dend_data, h = 14 )
+p1=fviz_dend(dend_cuts$lower[[1]])
+p2=fviz_dend(dend_cuts$lower[[2]])
+p3=fviz_dend(dend_cuts$lower[[3]])
+p4=fviz_dend(dend_cuts$lower[[4]])
+plot(p1, main="p1")
+plot(p2, main="p2")
+plot(p3, main="p3")
+plot(p4, main="p4")
+gridExtra::grid.arrange(p1, p2, p3, p4, nrow = 2)
+```
+>>>>>>> bde8d0dcb7dc212cf58ed1e2c0075193935fad37
 
 ``` {}
 
