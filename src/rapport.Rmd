@@ -280,43 +280,12 @@ cars.hc.ward = hclust(cars.dist, method="ward.D2")
 cars.hc.ward.inertia = sort(cars.hc.ward$height, decreasing = T)
 ```
 
-```{r fig-9-inertia-gain-ward}
-plot(cars.hc.ward.inertia[1:20], type = "s", 
-     xlab = "Nombre de classes", 
-     ylab = "Inertie", 
-     main = "Fig. 9 : Inertie du dendrogramme en fonction du nombre de classes")
-```
-
-Avant même de s'intéresser au dendrogramme en lui-même, il est intéressant de visualiser son inertie.
+Avant même de s'intéresser au dendrogramme en lui-même, il est intéressant de visualiser son inertie. Celle-ci est disponible dans la figure 10.
 Ici, deux sauts se distinguent nettement.
-Les deux variations d'inertie les plus grandes sont à 2 classes et à 4 classes :
+Les deux variations d'inertie les plus grandes sont à 2 classes et à 4 classes, mis en valeur dans la figure 11. La figure 12, quant à elle, montre le dendrogramme avec les différents niveaux de coupe séparés.
 
-```{r fig-10-hc-ward-inertia-critical-points}
-plot(cars.hc.ward.inertia[1:20], type = "s",
-     xlab = "Nombre de classes", 
-     ylab = "Inertie", 
-     main = "Fig 10. Inertie du dendrogramme avec plus grands gains entourés")
-points(c(2, 4), cars.hc.ward.inertia[c(2, 4)], col = c("green", "red"), cex = 2, lwd = 3)
-```
-
-```{r fig-11-hc-ward-partitions}
-par(mar=c(1,4.5,2,0))
-plot(cars.hc.ward, labels = FALSE, 
-     main = "Fig. 11 : Partitions en 2 ou 4 classes", 
-     ylab = "Hauteur", 
-     hang = -1)
-rect.hclust(cars.hc.ward, 2, border = "green")
-rect.hclust(cars.hc.ward, 4, border = "red")
-```
-
-Encore une fois, comme avec K-moyennes, il pourrait être intéressant d'interpréter les résultats de la table de contingence entre `brand` et les classes résultant de la CAH, ce paramètre n'entrant pas en compte dans le calcul de la matrice de dissimilarité.
-Pour ce faire, on utilise la fonction `afficher_table_contingence_clusters` :
-
-```{r table-9-hc-ward-contingency-tables}
-# on coupe au niveau 4 et affichons les tables de contingences
-print("Table 9 : Table de contingence des résultats des coupes 2 et 4 par rapport aux marques")
-cut_affiche_table_contingence(cars.hc.ward, c(2, 4), cars$brand) 
-```
+Encore une fois, comme avec K-moyennes, il pourrait être intéressant d'interpréter les résultats de la table de contingence entre `brand` et les classes résultant de la CAH, ce paramètre n'entrant pas en compte dans le calcul de la matrice de dissimilarités.
+Pour ce faire, on utilise la fonction `afficher_table_contingence_clusters`, dont le résultat est rendu disponible dans la table 9.
 
 Pour le partitionnement à deux classes, on peut observer que 100 % des voitures non américaines sont contenues dans la classe 2.
 Cela constitue une différence majeure avec le partitionnement en deux classes obtenus avec K-moyennes, qui n'atteignait que 95 %.
@@ -329,12 +298,7 @@ Ces observations renforcent la validité des interprétations effectuées grâce
 Certaines voitures américaines sont cependant plus proches des voitures européennes et japonaises.
 
 Pour le partitionnement à quatre classes, on remarque que les voitures européennes et japonaises sont chacune présentes dans les trois mêmes classes dans des proportions relativement proches.
-Voici le résultat obtenu lorsque l'on décide de les regrouper :
-
-```{r table-10-hc-ward-contingency-table-combined-brands}
-print("Table 10 : Table de contingence des résultats de la coupe 4 par rapport aux marques combinées")
-cut_affiche_table_contingence(cars.hc.ward, 4, cars.combined.brand)
-```
+Voici le résultat obtenu lorsque l'on décide de les regrouper. Vous pouvez apprécier cette table dans la table 10.
 
 Comme avec le partitionnement à deux classes, on observe qu'il existe une classe seulement constituées de voitures américaines (il s'agit rigoureusement de la même classe, voir le dendrogramme), et les autres constituées d'un mélange de voitures américaines et non américaines.
 Cependant, à la différence du partitionnement précédent, les valeurs de `brand` sont plus finement séparées.
@@ -370,17 +334,15 @@ Grâce à l'ACP, nous partons des corrélations entre les variables pour les ré
 L'information originellement contenue dans les sept variables quantitatives du jeu de données va être résumée dans de nouveaux sous-espaces générés en maximisant l'inertie des données.
 En d'autres termes, l'analyse en composantes principales permet de condenser les informations des variables originelles dans de nouvelles variables moins nombreuses pour en faciliter le traitement et l'analyse.
 
-Comme énoncé dans la section *3. Prétraitement* **[à vérifier]**, la variable `brand` peut être utilisée comme variable supplémentaire lors de cette opération, celle-ci étant la seule variable catégorielle du jeu de données.
+Comme énoncé dans la section *3. Prétraitement*, la variable `brand` peut être utilisée comme variable supplémentaire lors de cette opération, celle-ci étant la seule variable catégorielle du jeu de données.
 
 ```{r pca}
 library(FactoMineR)
 #catdes(cars[, c(1:8)], 8)
 cars.pca <- PCA(cars.scaled, scale.unit=F, ncp = 10, graph = F, quali.sup = 8)
-summary(cars.pca)
-plot(cars.pca, choix="var", axes=1:2)
 ```
 
-On obtient alors sept composantes principales allant de `Dim1` à `Dim7`.
+On obtient alors sept composantes principales allant de `Dim1` à `Dim7`. Les résultats qui suivent découlent de l'interprétation de la table 11 contenant un sommaire des résultats de l'ACP et du cercle de corrélation obtenu en figure 13.
 
 Le tableau des valeurs propres est un outil permettant de déterminer quels sont les axes à prendre en compte pour l'ACP.
 Il est important que les valeurs propres des axes retenus restituent une part importante de la variance totale du jeu de données.
@@ -391,8 +353,6 @@ On peut dire que ces deux axes restituent 85 % des informations du jeu de donné
 15 % de l'inertie totale du jeu de données n'est donc pas considérée lors des interprétations que nous émettons.
 Nos interprétations sont cependant assez larges et solides pour ne pas pouvoir être remises en question par cette marge d'erreur.
 
-**[TODO avec CAH : Réalisez une ACP sur les résultats obtenus à l'aide de la CAH. Coloriez les résultats de l'ACP en fonction d'une variable -\> Yann : pour colorer, prendre la variable cars.hc.ward.cluster4]**
-
 Le graphique nous montre que sur les sept variables représentées, six sont corrélées avec `Dim1`, une observation cohérente puisque cette composante a une inertie de 72 % dans l'ensemble du data set.
 Parmi les variables corrélées négativement avec `Dim1` nous trouvons `mpg` (-89 %) et `time.to.60` (-71 %).
 Les variables corrélées positivement avec `Dim1` sont `hp` (95%), `cylinders` (93%), `cubicinches` (96%) et `weightlbs` (92%).
@@ -402,11 +362,7 @@ Plus une voiture est grosse et puissante, plus elle sera représentée sur la pa
 Pour `Dim2`, l'unique variable qui lui est corrélée est `year` à 86 %.
 `Dim2` caractérise donc l'âge du véhicule : celui-ci est anti corrélé avec `Dim2`, ce qui implique que sur le graphique des individus, les voitures les plus vieilles seront plutôt en bas du graphique.
 
-```{r pca-representation-quality}
-fviz_cos2(cars.pca, choice = "var", axes = 1:2)
-```
-
-L'ensemble des variables se trouvent relativement loin de l'origine, elles sont donc bien représentées par ce plan factoriel.
+On voit sur la figure 14 que l'ensemble des variables se trouvent relativement loin de l'origine, elles sont donc bien représentées par ce plan factoriel.
 On remarque que la variable `time.to.60`.
 est représentée seulement à hauteur de 50 % par ce plan.
 49 % de sa variance est contenue dans la troisième composante.
@@ -415,57 +371,20 @@ Quelconque interprétation basée sur uniquement la moitié de la variance ne se
 ## 7. Classification hiérarchique sur composantes principales
 
 ```{r hcpc}
-print(cars.pca)
 cars.hcpc <- HCPC(cars.pca, nb.clust = -1, consol=T, iter.max=50, 
                   min = 3, 
                   metric = "euclidean", method = "ward", 
-                  graph=T)
-
-#cars.hcpc = HCPC(cars.pca)
-#HCPC(cars, nb.clust = 0, graph = TRUE)
+                  graph=F)
 ```
 
-```{r hpcp}
-fviz_dend(cars.hcpc, 
-          cex = 0.7,                     # Taille du text
-          palette = "jco",               # Palette de couleur ?ggpubr::ggpar
-          rect = TRUE, rect_fill = TRUE, # Rectangle autour des groupes
-          rect_border = "jco",           # Couleur du rectangle
-          #labels_track_height = 0.8      # Augment l'espace pour le texte en 3D
-          show_labels = FALSE            #Retire les labels
-          )
-# TODO: en l'état, on voit pas grand chose, y aurait p't'être moyen d'améliorer ça ? J'ai 
-# cherché comment enlever les labels mais j'ai pas trouvé (un peu comme dans celui du
-# chunk hc-ward-partitions)
-```
+La HCPC suggère un partitionnement à trois classes, en plus du dendrogramme disponible dans la figure 15, on peut observer ces classes sur le graphique des individus du premier plan factoriel dans la figure 16.
 
-Le dendrogramme suggère une solution à 3 groupes, on peut également les visualiser sur l'ACP
-
-```{r hpcp-viz}
-fviz_cluster(cars.hcpc,
-             repel = TRUE,            # Evite le chevauchement des textes
-             show.clust.cent = TRUE, # Montre le centre des clusters
-             palette = "jco",         # Palette de couleurs, voir ?ggpubr::ggpar
-             ggtheme = theme_minimal(),
-             main = "Factor map"
-             )
-```
-
-```{r hcpc-interpretation-description-par-les-PC-/-axex-principaux }
-
-cars.hcpc$desc.axes$quanti
-```
-
-Les résultats ci-dessus indiquent que les individus dans les groupes 1 et 3 ont des coordonnées élevées sur l'axe 1 (`Dim1`) et l'axe 2 (`Dim2`) .
+Les résultats de la table 12 indiquent que les individus dans les groupes 1 et 3 ont des coordonnées élevées sur l'axe 1 (`Dim1`) et l'axe 2 (`Dim2`) .
 Les individus du groupe 2 ont des coordonnées élevées uniquement sur le deuxième axe.
 
-```{r hcpc-description-par-les-individus}
-cars.hcpc$desc.ind
-```
-
-Pour chaque groupe, les 5 meilleurs individus les plus proches du centre du cluster sont affichés et sont appelés parangons.
+La table 13, quant à elle, indique les cinq meilleurs individus les plus proches du centre de la classe ; ce sont les parangons de ces différentes classes.
 La distance entre chaque individu et le centre du groupe est fournie.
-Par exemple, les individus représentatifs pour le groupe 2 inclus les individus/véhicules suivants : 87, 34, 229, 208 et 159.
+Par exemple, les individus représentatifs pour le groupe 2 inclus les suivants : 87, 34, 229, 208 et 159.
 
 ## Conclusion
 

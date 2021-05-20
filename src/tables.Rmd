@@ -50,3 +50,28 @@ afficher_table_contingence_clusters(cars$brand, cars.kmeans.cluster3$cluster)
 print("Table 8 : Table de contingence des marques en fonction du résultat de K-moyennes avec k = 2")
 afficher_table_contingence_clusters(cars.combined.brand, cars.kmeans.cluster2$cluster)
 ```
+
+```{r table-9-hc-ward-contingency-tables}
+# on coupe au niveau 4 et affichons les tables de contingences
+print("Table 9 : Table de contingence des résultats des coupes 2 et 4 par rapport aux marques")
+cut_affiche_table_contingence(cars.hc.ward, c(2, 4), cars$brand) 
+```
+
+```{r table-10-hc-ward-contingency-table-combined-brands}
+print("Table 10 : Table de contingence des résultats de la coupe 4 par rapport aux marques combinées")
+cut_affiche_table_contingence(cars.hc.ward, 4, cars.combined.brand)
+```
+
+```{r table-11-summary-pca}
+print("Table 1 : Sommaire des résultats de la PCA sur le jeu de données")
+summary(cars.pca)
+```
+
+```{r table-12-hcpc-quanti-axes}
+cars.hcpc$desc.axes$quanti
+```
+
+```{r table-13-table-hcpc-ind-desc}
+cars.hcpc$desc.ind
+```
+

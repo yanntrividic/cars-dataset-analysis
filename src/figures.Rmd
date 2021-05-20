@@ -31,32 +31,88 @@ ggplot(df, aes(x = "", y = Occurrences, fill = brand)) + ggtitle("Fig. 2 : Diagr
 library(corrplot)
 corrplot(cars.correlations,addCoef.col = "grey", 
          number.cex = 0.5, 
-         title="Fig 2. Corrélogramme du jeu de données", 
+         title="Fig 3. Corrélogramme du jeu de données", 
          mar=c(0,0,1,0))
 ```
 
 ```{r fig-4-silhouette}
-fviz_nbclust(cars[-8], FUNcluster = kmeans, method = c("silhouette"), k.max = 15, nboot = 100) + labs(title="Fig. 3 : Nombre de classes optimal") +
+fviz_nbclust(cars[-8], FUNcluster = kmeans, method = c("silhouette"), k.max = 15, nboot = 100) + labs(title="Fig. 4 : Nombre de classes optimal") +
 xlab("Nombre de classes k") +
 ylab("Largeur moyenne de la silhouette")
 ```
 
 ```{r fig-5-stripplot-cluster2}
-stripplot_clusters(cars.scaled[-8], cars.kmeans.cluster2$cluster, 4)
+stripplot_clusters(cars.scaled[-8], cars.kmeans.cluster2$cluster, 5)
 ```
 
 ```{r fig-6-stripplot-cluster3}
-stripplot_clusters(cars.scaled[-8], cars.kmeans.cluster3$cluster, 5)
+stripplot_clusters(cars.scaled[-8], cars.kmeans.cluster3$cluster, 6)
 ```
 
 ```{r fig-7-stripplot-cluster4}
-stripplot_clusters(cars.scaled[-8], cars.kmeans.cluster4$cluster, 6)
+stripplot_clusters(cars.scaled[-8], cars.kmeans.cluster4$cluster, 7)
 ```
 
 ```{r fig-8-stripplots-brand}
-stripplot_clusters(cars.scaled[-8], cars$brand, 7)
+stripplot_clusters(cars.scaled[-8], cars$brand, 8)
 ```
 
 ```{r fig-9-stripplots-combined-brand}
-stripplot_clusters(cars.scaled[-8], cars.combined.brand, 8)
+stripplot_clusters(cars.scaled[-8], cars.combined.brand, 9)
 ```
+
+```{r fig-10-inertia-gain-ward}
+plot(cars.hc.ward.inertia[1:20], type = "s", 
+     xlab = "Nombre de classes", 
+     ylab = "Inertie", 
+     main = "Fig. 10 : Inertie du dendrogramme en fonction du nombre de classes")
+```
+
+```{r fig-11-hc-ward-inertia-critical-points}
+plot(cars.hc.ward.inertia[1:20], type = "s",
+     xlab = "Nombre de classes", 
+     ylab = "Inertie", 
+     main = "Fig 11. Inertie du dendrogramme avec plus grands gains entourés")
+points(c(2, 4), cars.hc.ward.inertia[c(2, 4)], col = c("green", "red"), cex = 2, lwd = 3)
+```
+
+```{r fig-12-hc-ward-partitions}
+par(mar=c(1,4.5,2,0))
+plot(cars.hc.ward, labels = FALSE, 
+     main = "Fig. 12 : Partitions en 2 ou 4 classes", 
+     ylab = "Hauteur", 
+     hang = -1)
+rect.hclust(cars.hc.ward, 2, border = "green")
+rect.hclust(cars.hc.ward, 4, border = "red")
+```
+
+```{r fig-13-var-pca}
+plot(cars.pca, choix="var", axes=1:2, title="Fig. 13 : Variables représentées sur le premier plan factoriel")
+```
+
+```{r fig-14-pca-representation-quality}
+fviz_cos2(cars.pca, choice = "var", axes = 1:2, title = "Fig. 14 : Cos2 des variables du premier plan factoriel")
+```
+
+```{r fig-15-hcpc-dendrogram}
+fviz_dend(cars.hcpc, 
+          cex = 0.7,                     # Taille du text
+          palette = "jco",               # Palette de couleur ?ggpubr::ggpar
+          rect = TRUE, rect_fill = TRUE, # Rectangle autour des groupes
+          rect_border = "jco",           # Couleur du rectangle
+          #labels_track_height = 0.8      # Augment l'espace pour le texte en 3D
+          show_labels = FALSE,            #Retire les labels
+          main = "Fig. 15 : Dendrogramme de la HCPC"
+          )
+```
+
+```{r fig-16-hcpc-ind-clusters}
+fviz_cluster(cars.hcpc,
+             repel = TRUE,            # Evite le chevauchement des textes
+             show.clust.cent = TRUE, # Montre le centre des clusters
+             palette = "jco",         # Palette de couleurs, voir ?ggpubr::ggpar
+             ggtheme = theme_minimal(),
+             main = "Fig. 16 : Classes trouvées par l'HCPC projetées sur le premier plan factoriel"
+             )
+```
+
