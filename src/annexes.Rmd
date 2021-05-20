@@ -1,0 +1,100 @@
+---
+title: "Annexes"
+pdf_document: default
+author: Yann Trividic
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+load("../data/all.rda")
+```
+
+## Annexe 1
+
+```{r annex-1-hc-ward-subclass}
+# le sous-arbre de la classe 2 est extrait
+cars.hc.ward.cut4.tree2 <- cut(as.dendrogram(cars.hc.ward), h = 13)$lower[[3]]
+
+# puis on extrait les indices
+library(dendextend)
+cars.hc.ward.cut4.tree2.ind <- as.numeric(names(cutree(cars.hc.ward.cut4.tree2, k=1)))
+
+dist = dist(cars.scaled[cars.hc.ward.cut4.tree2.ind, -8])
+cah.ward = hclust(dist, method="ward.D2")
+
+inertia = sort(cah.ward$height, decreasing = T)
+
+plot(inertia[1:20], type = "s", 
+     xlab = "Nombre de classes", 
+     ylab = "Inertie", 
+     main = "Inertie du dendrogramme en fonction du nombre de classes")
+
+# les points d'intérêts sont 2, 3 et 4
+plot(inertia[1:20], type = "s",
+     xlab = "Nombre de classes", 
+     ylab = "Inertie", 
+     main = "Inertie du dendrogramme avec plus grands gains entourés")
+points(c(2, 3, 4), inertia[c(2, 3, 4)], col = c("green", "red", "blue"), cex = 2, lwd = 3)
+
+# affichage du sous-arbre
+par(mar=c(1,4.5,2,0))
+plot(cah.ward, labels = FALSE, main = "Partitions en 2, 3 ou 4 classes", xlab = "", ylab = "Hauteur", sub = "", hang = -1)
+rect.hclust(cah.ward, 2, border = "green")
+rect.hclust(cah.ward, 3, border = "red")
+rect.hclust(cah.ward, 4, border = "blue")
+
+# affichage des tables de contingence
+cut_affiche_table_contingence(cah.ward, c(2, 3, 4), cars$brand[cars.hc.ward.cut4.tree2.ind])
+
+# on remarque que le partitionnement en deux classes n'est pas suffisant, et que celui à quatre
+# classes est trop. On remarque aussi que la distinction europe-japon est faible.
+
+# combinaison des marques pour le partitionnement en 3 classes :
+cah.ward.cut3 <- cutree(cah.ward, 3)
+afficher_table_contingence_clusters(cars.combined.brand[cars.hc.ward.cut4.tree2.ind], cah.ward.cut3)
+
+# les résultats obtenus permettent de constater une amélioration du partitionnement, 
+# mais celui-ci n'est pas assez significatif pour être conservé
+```
+
+## Annexe 2
+
+```{r annex-2-hc-single-link}
+cars.hc.min = hclust(cars.dist, method="single")
+par(mar=c(1,4.5,2,0))
+plot(cars.hc.min, labels = FALSE, main = "Dendrogramme suite à la CAH avec lien minimum", xlab = "", ylab = "Hauteur", sub = "", hang = -1)
+```
+
+## Annexe 3
+
+```{r annex-3-hc-complete-link}
+cars.hc.max = hclust(cars.dist, method="complete")
+par(mar=c(1,4.5,2,0))
+plot(cars.hc.max, labels = FALSE, main = "Dendrogramme suite à la CAH avec lien maximum", xlab = "", ylab = "Hauteur", sub = "", hang = -1)
+
+cars.hc.max.inertia = sort(cars.hc.max$height, decreasing = T)
+
+plot(cars.hc.max.inertia[1:20], type = "s", 
+     xlab = "Nombre de classes", 
+     ylab = "Inertie", 
+     main = "Inertie du dendrogramme en fonction du nombre de classes")
+
+# On remarque des points d'intérêt à 2, 3 et 4
+plot(cars.hc.max.inertia[1:20], type = "s",
+     xlab = "Nombre de classes", 
+     ylab = "Inertie", 
+     main = "Inertie du dendrogramme avec plus grands gains entourés")
+points(c(2, 3, 4, 5), cars.hc.max.inertia[c(2, 3, 4, 5)], col = c("green", "red", "blue", "orange"), cex = 2, lwd = 3)
+
+# affichage
+par(mar=c(1,4.5,2,0))
+plot(cars.hc.max, labels = FALSE, main = "Partitions en 2, 3, 4 ou 5 classes", xlab = "", ylab = "Hauteur", sub = "", hang = -1)
+rect.hclust(cars.hc.max, 2, border = "green")
+rect.hclust(cars.hc.max, 3, border = "red")
+rect.hclust(cars.hc.max, 4, border = "blue")
+rect.hclust(cars.hc.max, 5, border = "orange")
+
+# affichage des tables de contingence
+cut_affiche_table_contingence(cars.hc.max, c(2, 3, 4, 5), cars$brand)
+```
+

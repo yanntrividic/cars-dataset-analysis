@@ -1,0 +1,52 @@
+---
+title: "Tables"
+pdf_document: default
+author: Yann Trividic
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+load("../data/all.rda")
+```
+
+```{r table-1-summary}
+print("Table 1 : Sommaire des variables quantitatives du jeu de données")
+summary(cars[-8]) # the last column is not included as it is a textual variable
+```
+
+```{r table-2-quantiles}
+print("Table 2 : Quantiles")
+apply(cars[1:7], MARGIN=2, FUN=quantile, probs=seq(0, 1, 0.1))
+```
+
+```{r table-3-contingency-brand}
+print("Table 3 : Table de contingence de la variable brand")
+prop.table(contingency_table)
+```
+
+```{r table-4-variables-summary-by-brand}
+print("Table 4 : Sommaire des variables par marque")
+lapply(split(cars[-8], cars$brand), psych::describe)
+```
+
+```{r table-5-corr-mat}
+cars.correlations <- cor(cars[-8]) # on inclut pas la dernière variable
+
+print("Table 5 : Table des corrélations des variables quantitatives du jeu de données")
+print(cars.correlations)
+```
+
+```{r table-6-ordered-corr}
+print("Table 6 : Corrélations du jeu de données ordonnées par valeurs absolues")
+print(getOrderedCorrelations(cars.correlations))
+```
+
+```{r table-7-contingency-table-brand-cluster3}
+print("Table 7 : Table de contingence des marques en fonction du résultat de K-moyennes avec k = 3")
+afficher_table_contingence_clusters(cars$brand, cars.kmeans.cluster3$cluster)
+```
+
+```{r table-8-contingency-table-brand-cluster2}
+print("Table 8 : Table de contingence des marques en fonction du résultat de K-moyennes avec k = 2")
+afficher_table_contingence_clusters(cars.combined.brand, cars.kmeans.cluster2$cluster)
+```

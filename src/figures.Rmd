@@ -1,0 +1,62 @@
+---
+title: "Figures"
+pdf_document: default
+author: Yann Trividic
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+load("../data/all.rda")
+```
+
+```{r fig-1-boxplots}
+par(mar=c(7,3,2,2))
+boxplot(cars.scaled[-8], las=2, main="Fig. 1 : Diagrammes en boîte des variables quantitatives de cars")
+```
+
+```{r fig-2-piechart-brand}
+library(ggplot2, warn.conflicts = FALSE)
+library(dplyr, warn.conflicts = FALSE)
+
+contingency_table <- table(cars$brand) 
+df <- data.frame(brand = names(contingency_table),
+                 Occurrences = as.vector(contingency_table))
+
+ggplot(df, aes(x = "", y = Occurrences, fill = brand)) + ggtitle("Fig. 2 : Diagramme circulaire de brand") +
+    geom_bar(width = 1, stat = "identity", color = "white") +
+    coord_polar("y", start = 0)
+```
+
+```{r fig-3-corrplot}
+library(corrplot)
+corrplot(cars.correlations,addCoef.col = "grey", 
+         number.cex = 0.5, 
+         title="Fig 2. Corrélogramme du jeu de données", 
+         mar=c(0,0,1,0))
+```
+
+```{r fig-4-silhouette}
+fviz_nbclust(cars[-8], FUNcluster = kmeans, method = c("silhouette"), k.max = 15, nboot = 100) + labs(title="Fig. 3 : Nombre de classes optimal") +
+xlab("Nombre de classes k") +
+ylab("Largeur moyenne de la silhouette")
+```
+
+```{r fig-5-stripplot-cluster2}
+stripplot_clusters(cars.scaled[-8], cars.kmeans.cluster2$cluster, 4)
+```
+
+```{r fig-6-stripplot-cluster3}
+stripplot_clusters(cars.scaled[-8], cars.kmeans.cluster3$cluster, 5)
+```
+
+```{r fig-7-stripplot-cluster4}
+stripplot_clusters(cars.scaled[-8], cars.kmeans.cluster4$cluster, 6)
+```
+
+```{r fig-8-stripplots-brand}
+stripplot_clusters(cars.scaled[-8], cars$brand, 7)
+```
+
+```{r fig-9-stripplots-combined-brand}
+stripplot_clusters(cars.scaled[-8], cars.combined.brand, 8)
+```

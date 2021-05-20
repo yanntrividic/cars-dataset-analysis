@@ -1,5 +1,5 @@
 ---
-title: "Cars dataset analysis"
+title: "Analyse du jeu de données cars"
 author:
 - Aissatou Signate
 - Jacky Thay
@@ -8,9 +8,6 @@ output:
   pdf_document: default
   html_document:
     df_print: paged
-abstract: |
-  This is the abstract.
-  It consists of two paragraphs
 tags:
 - data analysis
 - cars
@@ -20,97 +17,16 @@ tags:
 - pca
 - clustering
 - statistics
-editor_options: 
-  markdown: 
+editor_options:
+  markdown:
     wrap: sentence
 ---
 
-# Sujet
+## Introduction
 
-## Sujet du projet
-
-Ce projet est un travail sur données réelles.
-Il s'agit de mettre en oeuvre une ou plusieurs méthodes vues en cours sur un jeu de données proposé pour chaque groupe.
-
-Le projet doit suivre les étapes suivantes :
-
--   analyser le jeu de données proposé afin de choisir l'approche la plus adaptée à votre problème,
--   effectuer un prétraitement de votre base de données (si nécessaire),
--   justifier le choix de votre approche,
--   tester l'approche choisie sur l'ensemble de données en utilisant les options vues en cours,
--   analyser et commenter les résultats obtenus.
-
-## Présentation du rapport
-
-Le rapport du projet doit présenter de façon claire et concise:
-
--   l'objet de l'analyse,
--   la description des données (individus/variables utilisées, variables supplémentaires etc.),
--   l'analyse proprement dite,
--   les commentaires sur les résultats obtenus.
-
-Ce rapport ne devrait pas dépasser 10 pages (les codes sources des programmes utilisés peuvent être mis en annexe).
-
-Le projet sera jugé selon les critères suivants:
-
--   adéquation des méthodes utilisées aux données et problème étudiés,
--   richesse des analyses proposées (au delà du minimum requis),
--   justesse des commentaires sur les résultats,
--   qualité de la présentation du rapport.
-
-## Remise du projet
-
-Vous devez déposer votre rapport en format .pdf portant le nom : nom1_nom2_nom3_trinomeX.pdf au plus tard le 20 mai 2021 sous Moodle dans le dossier Rendu_projet_TND.
-
-# Notes sur les différentes étapes
-
-**1. analyser le jeu de données proposé afin de choisir l'approche la plus adaptée à votre problème**
-
--   Pour la **description des données**, tout ce qu'on a besoin de savoir est là : <https://www.kaggle.com/yugagrawal95/k-means-clustering-using-seaborn-visualization>. Décrire les différentes colonnes du jeu de données, les valeurs pouvant être prises par celles-ci, leur mode (numérique [entier, double, continue, discret], caractère, logique, `NULL`...), etc. Le nombre de colonnes aussi et la syntaxe comptent aussi. Quelles sont les données ordinales/qualitatives et quelles sont les données quantitatives.
--   Il faut **poser une problématique**, aussi générale soit-elle. Par exemple, quelle est l'influence des diverses variables sur les performances d'une voiture ? Comprendre quelles sont les avantages et les inconvénients d'avoir plus de chevaux, une plus grosse consommation d'essence, etc.
--   Combien a-t-on d'individus, combien de variables ?
-
-**2. effectuer un prétraitement de votre base de données (si nécessaire)**
-
--   Effectuer une **analyse descriptive de base** (regarder ce qu'il est possible de déduire de la fonction `summary`, en faire un résumé, regarder ce qui ressort de la fonction `pairs`, et la fonction `quantile`, peut-être la matrice de corrélations ?)
--   Il y a-t-il des données ordinales ? [Non.] Textuelles ? [Oui, mais non, c'est pas des textes] Qualitatives ? [Oui.] Nominales ? [Oui.] Comment est-ce qu'on pourrait les traiter le mieux possible ? Les utiliser comme marqueurs dans la PCA et la CAH ? Par défaut, on mettra les variables qualitatives en tant que variables supplémentaires (ni l'ACP ni la CAH ne peuvent les traiter). Certaines variables quantitatives peuvent être considérées comme supplémentaires (par exemple, les variables qui décrivent d'autres variables ; le pH et le taux d'acide citrique)
--   Lister les variables qui sont le plus corrélées. On devrait retrouver ces corrélations dans les résultats de l'ACP
--   Potentiellement centrer les valeurs si les résultats de l'analyse univariée donne des résultats très hétérogènes. Càd si les valeurs prises par les variables sont sur des intervalles/variances/moyennes très différents.
--   Est-ce que tous les objets sont complets ? Il y a-t-il des **valeurs manquantes** (fonction `is.na`) ? Il y a-t-il des **valeurs aberrantes** à enlever (justifier pourquoi on les enlève) ? Décide-t-on de tolérer une marge d'erreur, remplacer les valeurs, supprimer les individus ? Essayer de comprendre pourquoi ces valeurs sont là, proposer des hypothèses si pertinent. Avec k-means par exemple, les valeurs aberrantes peuvent donner des résultats erronés. La forme des clusters est aussi importante.
-
-**3. justifier le choix de votre approche**
-
--   Choisir un ensemble d'algorithmes à utiliser parmi ceux qu'on a vu (k-means, PCA, CAH, HCPC) et expliquer en quoi il serait pertinent de les utiliser au vu de ce qu'on a déduit du point précédent.
-    Pour déterminer quel algo choisir, se référer aux caractéristiques des méthodes de classification (voir cours).
-
-    -   Pourquoi l'ACP ? Trouver des individus similaires ; comment est-ce qu'une caractéristique va affecter les valeurs des autres caractéristiques, etc.
-
--   Avec chacun des algorithmes utilisés, justifier le choix la valeur de chacun des paramètres (exemple : pourquoi utiliser la méthode de Ward (voir cours), quels sont les résultats avec les autres méthodes ?
-    Quel critère de qualité ?)
-
--   Ajouter l'utilisation d'autres d'outils statistiques : regression, chi², degré d'asymétrie (skewness), degré d'aplatissement (Kurtosis)...
-
-**4. tester l'approche choisie sur l'ensemble de données en utilisant les options vues en cours**
-
--   Idéalement, je pense qu'il serait bien d'**enregistrer un fichier** `results.csv`, contenant les données de bases et une colonne pour chaque résultat pertinent.
--   Dans certains cas, il pourrait être intéressant de **diviser le jeu de données en différents sous-jeux** (par exemple, les voitures d'une certaine décennie, ou les voitures avec un certain type de moteur) et regarder comment les résultats varient au sein de ces sous-jeux. Pour ça, utiliser la fonction `aggregate`.
--   Consolider les résultats (consolider les résultats de la PCA avec HCPC, les résultats de la CAH avec k-means, etc.).
-
-**5. analyser et commenter les résultats obtenus**
-
--   Se baser sur les corrections fournies pour les TD 5 et 6.
--   **Caractérisation des classes :** la partition obtenue peut être considérée comme une variable quantitative, chercher une variable qui caractérise le mieux une partition revient à chercher les variables qui caractérisent le mieux cette variable qualitative. Pour chaque variable quantitative, on va construire un modèle d'analyse de variance entre la variable quantitative, qui aura de le rôle de la variable réponse, en fonction de la variable de classe (qualitative). On construit ensuite un test de Fisher pour voir s'il y a un effet de la variable de classe sur la variable quantitative. On peut concerver les variables ayant une probabilité critique inférieure à 5 %, et trier ces variables par probabilité croissante. Attention : les variables ayant eu un rôle actif dans la construction des résultats (par exemple lorsqu'elles participent au calcul de la distance) ne sont pas totalement indépendantes des classes attribuées. Seules les probabilités critiques associées aux variables supplémentaires (dans notre cas, `brand`) peuvent être réellement interprétées comme décrit ici. Le test de Fisher nous permettrait donc de vérifier nos résultats de manière quantifiée et de savoir si les classes obtenues seraient représentatives ou non des classes obtenues avec les différents algorithmes de partitionnement.
--   On pourrait potentiellement colorer les résultats de l'ACP en fonction de certaines variables ayant beaucoup contribué dans les axes principaux.
--   Calculer quel est le nombre d'axe optimal à garder grâce au pourcentage d'inertie de l'ACP. Pareil pour la CAH.
--   Pour l'ACP, vérifier la qualité de la projection des différentes variables en regardant le cos² associé à cette variable.
--   Dans certains cas, un axe de l'ACP peut avoir été défini par un seul individu, ou une seule variable. Il peut être intéressant de refaire une ACP sans cette variable/individu si l'interprétation de ce phénomène le justifie.
--   Pour chaque interprétation, il est important de revenir aux données de départ pour les valider et citer des exemples.\
-
-**2. Objet de l'analyse**
-
--   Expliciter des tendances sous-jacentes du jeu de données, analyse descriptive du jeu de données pour mieux comprendre les liens entre les différentes variables, et ainsi mieux comprendre les performances des véhicules en fonction de leurs attributs.
-
-# Code
+```{r}
+source("utils.R")
+```
 
 ## 1. Lecture des données
 
@@ -159,7 +75,7 @@ On peut noter que les unités de mesure associées aux différentes variables so
 
 ```{r normalization}
 cars$brand = as.factor(cars$brand) # Transformation en factor
-cars.scaled = merge(scale(cars[-8]), cars$brand)
+cars.scaled = cbind(scale(cars[-8]), cars[8])
 ```
 
 ## 4. Analyse univariée
@@ -170,39 +86,15 @@ cars.scaled = merge(scale(cars[-8]), cars$brand)
 
 Grâce à la fonction `summary`, nous avons un aperçu global des différentes distributions des variables composant notre base de données en calculant des statistiques de base (critères de position et critères de dispersion).
 Pour les variables quantitatives, `summary` nous retourne le minimum, le maximum, la moyenne et les trois quartiles.
-**[Yann : ajouter l'interprétation des résultats de summary, potentiellement le faire avec la fonction psych::describe pour être plus précis]**
-
-```{r summary}
-library(psych)
-psych::describe(cars[-8])
-summary(cars[-8]) # the last column is not included as it is a textual variable
-```
+La table 1, présente dans le document `tables.pdf`, contient les informations énoncées précédemment.
 
 Pour calculer des quantiles d'un jeu d'observations stocké dans un vecteur $v$, nous utilisons la fonction `quantile`.
-Sans plus d'argument, celle-ci calcule les quantiles à 0 %, 25 %, 50 %, 75 % et 100 %.
+Celle-ci calcule les quantiles à 0 %, 25 %, 50 %, 75 % et 100 %.
 Pour avoir les quantiles à d'autres ordres, il faut manipuler le paramètre `probs`.
-Dans notre cas , nous les calculons par intervalle de 10 % :
+Dans notre cas , nous les calculons par intervalle de 10 %.
+Ces résultats sont trouvables dans la table 2.
 
-```{r quantiles}
-apply(cars[1:7], MARGIN=2, FUN=quantile, probs=seq(0, 1, 0.1))
-```
-
-Un box-plot est un graphique composé d'un rectangle, deux droites sortent afin de représenter certains éléments des données.
-
-La valeur centrale du graphique est la médiane (il existe autant de valeur supérieures qu'inférieures à cette valeur dans l'échantillon).
-
-Les bords du rectangle sont les quartiles (Pour le bord inférieur, un quart des observations ont des valeurs plus petites et trois quart ont des valeurs plus grandes, le bord supérieur suit le même raisonnement).
-
-Les extrémités des moustaches sont calculées en utilisant 1.5 fois l'espace interquartile (la distance entre le 1er et le 3ème quartile).
-On peut remarquer que 50% des observations se trouvent à l'intérieur de la boîte.
-**[Yann : je suis pas sûr qu'il soit utile d'expliquer comment lire un boxplot, pour moi les quatre phrases qui précèdent ne sont pas utiles. A la limite, on pourrait mettre un lien vers la page Wiki si vraiment ça semble nécessaire]**
-
-```{r boxplots}
-par(mar=c(7,3,2,2))
-boxplot(cars.scaled[-8], las=2, main="Diagrammes en boîte des variables quantitatives de cars")
-```
-
-**[Yann : aussi, j'pense que ce serait mieux si on avait en général les interprétations des graphiques après que les graphiques aient été affichés, du coup j'ai déplacé les graphiques]**
+On ajoute à cela les diagrammes en boîte, il s'agit de la figure 1 du document `figures.pdf`.
 
 Ces diagrammes en boîtes permettent de visualiser plus facilement les résultats obtenus précédemment grâce à la fonction `summary`.
 Par exemple, pour la variable `mpg`, on peut lire que sa valeur médiane est $22$, et que les valeurs sont un peu plus dispersées au-dessus de cette valeur médiane.
@@ -212,7 +104,7 @@ La même observation peut être faite concernant la variable `year`.
 
 En ce qui concerne la variable `time.to.60`, on peut noter la présence de valeurs aberrantes.
 Une valeur aberrante est une valeur qui s'écarte fortement des valeurs des autres observations, anormalement faible ou élevée.
-Ici, ces valeurs correspondent à des voitures ayant une accélération anormalement élevée (\~8 secondes pour atteindre 60 mph pour la plus rapide) ou anormalement faible (\~25 secondes pour la plus lente).
+Ici, ces valeurs correspondent à des voitures ayant une accélération anormalement élevée (8 secondes pour atteindre 60 mph pour la plus rapide) ou anormalement faible (25 secondes pour la plus lente).
 Ces valeurs ne semblent pas être des erreurs de mesure mais simplement des voitures sortant de la norme.
 Dans certains cas, il est nécessaire d'effectuer un traitement particulier sur ces valeurs.
 Avec ces valeurs en particuliers, nous considérons qu'il est possible de continuer l'analyse en l'état, celles-ci n'allant pas poser pas de problèmes.
@@ -221,31 +113,12 @@ Avec ces valeurs en particuliers, nous considérons qu'il est possible de contin
 
 Le jeu de données `cars` contient, en plus des sept variables quantitatives déjà abordées, une variable qualitative : la variable `brand`.
 Cette donnée, par sa nature, doit être traitée séparément du reste.
-
-```{r piechart-brand}
-library(ggplot2, warn.conflicts = FALSE)
-library(dplyr, warn.conflicts = FALSE)
-
-contingency_table <- table(cars$brand) 
-df <- data.frame(brand = names(contingency_table),
-                 Occurrences = as.vector(contingency_table))
-
-ggplot(df, aes(x = "", y = Occurrences, fill = brand)) +
-    geom_bar(width = 1, stat = "identity", color = "white") +
-    coord_polar("y", start = 0)
-
-prop.table(contingency_table)
-```
+La répartition de occurrences des différentes marques peut être appréciée dans la figure 2, en annexes, de même que la table 3, illustrant la table de contingence des différentes marques dans le jeu de données.
 
 Comme on peut le voir, la distribution des individus en fonction de la variable brand est tout sauf uniforme : près de deux tiers sont des voitures américaines (62 %) tandis que les voitures japonaises et européennes se partagent de manière à peu près égale le dernier tiers des données, soit respectivement environ 20 et 18 %.
-Cette surréprésentation des voitures américaines sera à prendre en compte tout au long de l'analyse.
+Cette surreprésentation des voitures américaines sera à prendre en compte tout au long de l'analyse.
 
-Il nous est aussi possible de résumer les différentes distributions des variables en fonction des valeurs de `brand`.
-
-```{r variables-summary-by-brand}
-lapply(split(cars[-8], cars$brand), summary)
-lapply(split(cars[-8], cars$brand), psych::describe)
-```
+Il nous est aussi possible de résumer les différentes distributions des variables en fonction des valeurs de `brand`. Ces résultats sont disponibles dans la table 4.
 
 Le résultat obtenu nous permet d'avoir une idée claire des différences de distribution des valeurs en fonction de `brand`.
 On peut voir notamment une hiérarchie entre les provenances des voiture et leur consommation en carburant : en règle générale, une voiture japonaise consommera moins qu'une européenne, qui elle-même consommera moins qu'une américaine.
@@ -271,48 +144,15 @@ Les voitures américaines sont quant à elles très différentes des deux autres
 
 Une matrice de corrélation est utilisée pour visualiser la liaison linéaire entre plusieurs variables.
 Il s'agit d'un tableau contenant les coefficients de corrélation entre chaque variable.
-Pour l'obtenir, on peut utiliser la fonction `cor`, présente dans les fonctions de base de R.
+Pour l'obtenir, on peut utiliser la fonction `cor`, présente dans les fonctions de base de R. La table des corrélations est affichée dans la table 5 document `tables.pdf`.
 
-```{r corr-mat}
-cars.correlations <- cor(cars[-8]) # the last column is not included as it is a textual variable
-#write.csv(cars.correlations, file="../data/correlations.csv")
-cars.correlations
-```
-
-Nous pouvons également visualiser et représenter graphiquement notre matrice avec un corrélogramme.
+Nous pouvons également visualiser et représenter graphiquement notre matrice avec un corrélogramme. Ce corrélogramme peut être apprécié avec la figure 3.
 Cet outil permet de mettre en évidence les variables les plus corrélées : les coefficients de corrélation sont colorés en fonction de leur valeur.
 
 La valeur $1$ indique que les deux variables sont exactement corrélées, c'est le cas avec une relation parfaitement linéaire entre deux variables.
 À l'inverse, une corrélation de $-1$ entre deux variables indique une parfaite anti-corrélation entre ces dernières.
 Les corrélations dont la valeur absolue sont supérieures à $0,5$ peuvent être considérées comme des corrélations fortes.
 Les autres, celles comprises entre $-0,5$ et $0,5$, peuvent être considérées comme des corrélations faibles.
-
-Le 0.95 entre cylindre et cubinches signifie que le nombre de cylindres du véhicule (cubinches) joue pour 90,25% (0,95)\*(0,95) sur la valeur du volume moteur **[Yann : ce n'est pas juste, une corrélation n'implique pas une causalité]**
-
-```{r corrplot}
-library(corrplot)
-corrplot(cars.correlations,addCoef.col = "grey", number.cex = 0.5)
-
-#' Fonction permettant d'ordonner les différentes corrélations par ordre
-#' décroissant par défaut en fonction de la valeur absolue de la corrélation
-#'
-#' @param df le dataframe dont les corrélations sont à extraire
-#' @param order paramètre optionnel pour préciser l'ordre de tri (defaut:décroi)
-#' @param threshold paramètre optionnel pour préciser un seuil (défaut: <=0.5)
-#' @return un tableau contenant les corrélations ordonnées
-getOrderedCorrelations <- function(df, order=T, threshold=0.5) {
-    orderedCor <- as.data.frame(as.table(df))
-    orderedCor <- orderedCor[order(abs(orderedCor$Freq), decreasing=order),]
-    orderedCor <- orderedCor[abs(orderedCor$Freq)<1 & abs(orderedCor$Freq)>=threshold,]
-    rownames(orderedCor) <- NULL
-    withoutDuplicated <- orderedCor[seq(from=1, to=nrow(orderedCor), by=2),]
-    rownames(withoutDuplicated) <- NULL
-    return(withoutDuplicated)
-}
-
-orderedCor = getOrderedCorrelations(cars.correlations)
-print(orderedCor)
-```
 
 À la lecture de ce corrélogramme, on peut noter que la variable `mpg` est très fortement anti-corrélée avec les variables `cylinders`, `cubicinches`, `hp` et `weightlbs`, avec des valeurs allant de $-0,78$ à $-0,82$.
 De manière générale, on remarquera de très fortes corrélations positives entre les quatre dernières variables citées (toutes supérieures à $0,85$).
@@ -351,17 +191,13 @@ Cette méthode suppose cependant de préciser en paramètre le nombre de classes
 Notre jeu de données étant en sept dimensions (sept variables quantitatives), il est difficile de visualiser les résultats de l'algorithme des K-moyennes pour estimer le nombre de classes le plus approprié.
 Afin de surmonter ce problème, il existe de nombreuses approches mathématiques pour quantifier la qualité des résultats de l'algorithme K-moyennes.
 La plus connue est celle du [coefficient de silhouette](https://fr.wikipedia.org/wiki/Silhouette_(clustering)).
-Nous l'utiliserons dans un premier temps pour obtenir des résultats préliminaires.
-
-```{r silhouette}
-fviz_nbclust(cars[-8], FUNcluster = kmeans, method = c("silhouette"), k.max = 15, nboot = 100)
-```
+Nous l'utiliserons dans un premier temps pour obtenir des résultats préliminaires, une représentation est disponible avec la figure 4.
 
 Le coefficient de silhouette mesure la qualité de la partition obtenue après avoir appliqué un algorithme de classification.
-Ici, on lance une série d'algorithmes K-moyennes avec le nombre de classe minimum à $1$ et le maximum à \$15\$.
+Ici, on lance une série d'algorithmes K-moyennes avec le nombre de classe minimum à $1$ et le maximum à $15$.
 On obtient les scores moyens obtenus par les différentes partitions en fonction du nombre de classes.
 
-On remarque que la meilleure partition a obtenu un score d'environ $0,62$ (celui-ci pouvant monter jusqu'à \$1\$) avec deux classes.
+On remarque que la meilleure partition a obtenu un score d'environ $0,62$ (celui-ci pouvant monter jusqu'à $1$) avec deux classes.
 Cependant, les scores obtenus par les partitionnements à trois et quatre classes sont relativement proche du meilleur score.
 La différence entre ces scores n'est pas suffisante pour en garder un seul.
 
@@ -374,77 +210,23 @@ cars.kmeans.cluster3 <- kmeans(cars[-8], 3) # à trois classes,
 cars.kmeans.cluster4 <- kmeans(cars[-8], 4) # à quatre classes.
 ```
 
-Voici maintenant une visualisation de ces partitionnement couplés aux distributions normalisées des variables :
-
-```{r stripplots-clusters}
-library(lattice)
-library(gridExtra, warn.conflicts = FALSE)
-
-#' Fonction permettant d'afficher une série de strip plots des variables d'un
-#' data.frame et de les colorer et fonction de classes.
-#' 
-#' @param scaledQuantitativeValues data.frame ne comportant que des valeurs 
-#' quantitatives normalisées
-#' @param cluster classes associées aux individus du data.frame
-stripplot_clusters <- function(scaledQuantitativeValues, cluster){
-    v <- as.vector(unlist(cars.scaled[-8]))
-    y <- rep(c(1:ncol(scaledQuantitativeValues)), each=nrow(scaledQuantitativeValues))
-    xydata <- data.frame(v, y)
-    colors = rep(cluster, ncol(scaledQuantitativeValues))
-    xyplot(y ~ v, 
-           xydata, 
-           groups=colors,
-           main = paste("Distribution des variables de cars colorées par", 
-                        length(unique(cluster)),
-                        "classes"),
-           xlab = "Distributions",
-           ylab = "Index des variables de cars",
-           auto.key = list(space="top", x=0, y=0),
-           lattice.options = list(legend.bbox="panel"))
-}
-       
-stripplot_clusters(cars.scaled[-8], cars.kmeans.cluster2$cluster)
-stripplot_clusters(cars.scaled[-8], cars.kmeans.cluster3$cluster)
-stripplot_clusters(cars.scaled[-8], cars.kmeans.cluster4$cluster)
-```
+Une visualisation de ces différents partitionnements couplés aux distributions normalisées des variables sont disponibles avec les figures 5, 6 et 7.
 
 On peut voir sur ces différents graphiques les classes se séparer clairement.
 On remarque que les variables corrélées voient la distributions de leurs classes être similaires, ce qui était prévisibles.
 Dans la même idée, on observe que les distributions des classes sont en miroir lorsque qu'on regarde deux variables anti-corrélées.
 Ces points sont tous cohérents avec les interprétations données dans la section *4.2 Corrélations*.
-**[Vérifier section]**
 
 Un point intéressant à noter est que la séparation des classes est plus prononcés pour certaines variables que pour d'autres.
 Par exemple, la variable `weightlbs` (index 5) a dans les trois cas des classes parfaitement séparées.
 Au contraire, `cubicinches` (index 1) voit la distribution de ses classes moins distincte.
 
-En addition à cela, on peut comparer ces classes à la classe explicitement définie par le jeu de données : la variable `brand`.
-
-```{r stripplots-brand}
-stripplot_clusters(cars.scaled[-8], cars$brand)
-```
+En addition à cela, on peut comparer ces classes à la classe explicitement définie par le jeu de données : la variable `brand`. La distribution de ces variables est disponible dans la figure 8.
 
 Les voitures américaines prennent bien entendu la plus grande part des individus (voir section *4.1.2 Variables qualitatives* **[Vérifier section]**).
 On remarque que les voitures américaines prennent presque systématiquement un côté du spectre des valeurs, tandis que les japonaises et les européennes se partagent la seconde extrémité de manière plus ou moins distincte selon les variables.
 
-En regardant conjointement la distribution des variables colorées par le résultat de K-moyennes à trois classes et ce dernier graphique, on peut tenter d'assimiler les classes obtenues avec K-moyennes avec les valeurs de `brand` dans une table de contingence :
-
-```{r contingency-table-brand-cluster3}
-afficher_table_contingence_clusters = function(factor, cluster){
-    cat("Valeurs absolues :","\n")
-    print(rbind(table(factor, cluster), 
-                tot=table(cluster)))
-    
-    cat("\n","Valeurs relatives :","\n")
-    print(rbind(prop.table(table(factor, cluster)), 
-                tot=prop.table(table(cluster)))*100)
-}
-
-afficher_table_contingence_clusters(cars$brand, cars.kmeans.cluster3$cluster)
-
-```
-
-**[TODO: attention, il semblerait que les classes puissent être inversées d'une exécution à l'autre... Ce qui semble logique, instabilité de K-moyennes ---\> classes à rectifier la suite de la section]**
+En regardant conjointement la distribution des variables colorées par le résultat de K-moyennes à trois classes et ce dernier graphique, on peut tenter d'assimiler les classes obtenues avec K-moyennes avec les valeurs de `brand` dans une table de contingence, disponible dans le document `tables.pdf` avec la table 7.
 
 En observant les résultat d'une table de contingence correspondant à cette hypothèse, cette dernière s'en voit invalidée ; les résultats ne soutiennent pas l'idée que les classes trouvées correspondraient de manière acceptable aux valeurs de `brand`.
 En effet, la première classe contient autant de voiture américaines que japonaises ou européennes malgré le fait qu'elle soit la plus importante des trois classes (46 % des individus).
@@ -455,17 +237,14 @@ Remarquons aussi que la troisième classe ne contient qu'une seule voiture non-a
 Une interprétation similaire, bien que moins prononcée, peut être faite sur la classe 2.
 Les classes 2 et 3 caractérisent relativement bien les voitures américaines.
 
-Il est donc intéressant maintenant de voir si, en groupant les voitures européennes et japonaises, on obtient un meilleur partitionnement avec $k = 2$.
+Il est donc intéressant maintenant de voir si, en groupant les voitures européennes et japonaises, on obtient un meilleur partitionnement avec $k = 2$. Vous pouvez appréciez ces résultats avec la figure 9 et la table 8.
 
-```{r contingency-table-brand-cluster2}
+```{r brand-combinaison}
 cars.combined.brand <- cars$brand
 levels(cars.combined.brand)[1:2] <- 'Non-US' # remplace Japon et Europe par Non-US
-
-stripplot_clusters(cars.scaled[-8], cars.combined.brand)
-afficher_table_contingence_clusters(cars.combined.brand, cars.kmeans.cluster2$cluster)
 ```
 
-En comparant visuellement les résultats obtenus avec la fonction `stripplot_clusters` , on observe que même s'il y a une certaine correspondance entre les résultats obtenus, elle reste approximative.
+En comparant visuellement les résultats obtenus avec la fonction `stripplot_clusters`, on observe que même s'il y a une certaine correspondance entre les résultats obtenus, elle reste approximative.
 
 Cette même observation peut-être faite en lisant la table de contingence.
 On peut lire que plus de 95 % des voitures non américaines sont concentrées dans la classe 1.
@@ -477,7 +256,7 @@ Cependant, les voitures américaines peuvent appartenir aux deux classes, bien q
 
 En conclusion, l'interprétation des résultats de l'algorithme des K-moyennes permet donc de soutenir l'hypothèse qu'il existe bel et bien des différences quantitatives entre les différentes marques de voitures, et que celles-ci peuvent être partitionner au moins en partie.
 Les différences les plus grandes sont entre les voitures américaines et les non américaines.
-Les voitures européennes et japonaises sont différenciable, mais dans une moindre mesure.
+Les voitures européennes et japonaises sont différentiables, mais dans une moindre mesure.
 Ces différences ne permettent cependant pas d'avoir un partitionnement clair et sans équivoque entre les marques à partir de l'algorithme des K-moyennes ; une part importante des voitures américaines est indifférenciée des voitures non américaines.
 Il faut donc continuer l'analyse.
 
@@ -496,33 +275,34 @@ Le critère du lien minimum et celui du lien maximum sont utilisés dans la sect
 ```{r hc-ward-inertia}
 cars.dist = dist(cars.scaled[-8]) # matrice des distances euclidiennes entre individus
 
-# method = « ward.D2 » correspond au vrai critère de Ward utilisant le carré de la distance
+# "ward.D2" correspond au vrai critère de Ward utilisant le carré de la distance
 cars.hc.ward = hclust(cars.dist, method="ward.D2")
 cars.hc.ward.inertia = sort(cars.hc.ward$height, decreasing = T)
+```
 
+```{r fig-9-inertia-gain-ward}
 plot(cars.hc.ward.inertia[1:20], type = "s", 
      xlab = "Nombre de classes", 
      ylab = "Inertie", 
-     main = "Inertie du dendrogramme en fonction du nombre de classes")
+     main = "Fig. 9 : Inertie du dendrogramme en fonction du nombre de classes")
 ```
 
 Avant même de s'intéresser au dendrogramme en lui-même, il est intéressant de visualiser son inertie.
 Ici, deux sauts se distinguent nettement.
 Les deux variations d'inertie les plus grandes sont à 2 classes et à 4 classes :
 
-```{r hc-ward-inertia-critical-points}
+```{r fig-10-hc-ward-inertia-critical-points}
 plot(cars.hc.ward.inertia[1:20], type = "s",
      xlab = "Nombre de classes", 
      ylab = "Inertie", 
-     main = "Inertie du dendrogramme avec plus grands gains entourés")
-# TODO: vérifier ma supposition
+     main = "Fig 10. Inertie du dendrogramme avec plus grands gains entourés")
 points(c(2, 4), cars.hc.ward.inertia[c(2, 4)], col = c("green", "red"), cex = 2, lwd = 3)
 ```
 
-```{r hc-ward-partitions}
+```{r fig-11-hc-ward-partitions}
 par(mar=c(1,4.5,2,0))
 plot(cars.hc.ward, labels = FALSE, 
-     main = "Partitions en 2 ou 4 classes", 
+     main = "Fig. 11 : Partitions en 2 ou 4 classes", 
      ylab = "Hauteur", 
      hang = -1)
 rect.hclust(cars.hc.ward, 2, border = "green")
@@ -532,20 +312,13 @@ rect.hclust(cars.hc.ward, 4, border = "red")
 Encore une fois, comme avec K-moyennes, il pourrait être intéressant d'interpréter les résultats de la table de contingence entre `brand` et les classes résultant de la CAH, ce paramètre n'entrant pas en compte dans le calcul de la matrice de dissimilarité.
 Pour ce faire, on utilise la fonction `afficher_table_contingence_clusters` :
 
-```{r hc-ward-contingency-tables}
-cut_affiche_table_contingence = function(hc_result, cut_vector, factor){
-    for(cut in cut_vector){
-        cat(paste("\nCut =", cut, "\n"))
-        c = cutree(hc_result, cut)
-        afficher_table_contingence_clusters(factor, c)
-    }
-}
-
+```{r table-9-hc-ward-contingency-tables}
 # on coupe au niveau 4 et affichons les tables de contingences
+print("Table 9 : Table de contingence des résultats des coupes 2 et 4 par rapport aux marques")
 cut_affiche_table_contingence(cars.hc.ward, c(2, 4), cars$brand) 
 ```
 
-Pour le partionnement à deux classes, on peut observer que 100 % des voitures non américaines sont contenues dans la classe 2.
+Pour le partitionnement à deux classes, on peut observer que 100 % des voitures non américaines sont contenues dans la classe 2.
 Cela constitue une différence majeure avec le partitionnement en deux classes obtenus avec K-moyennes, qui n'atteignait que 95 %.
 
 La classe 2 comporte 54 % de voitures non américaines et 46 % de voiture américaines.
@@ -558,11 +331,12 @@ Certaines voitures américaines sont cependant plus proches des voitures europé
 Pour le partitionnement à quatre classes, on remarque que les voitures européennes et japonaises sont chacune présentes dans les trois mêmes classes dans des proportions relativement proches.
 Voici le résultat obtenu lorsque l'on décide de les regrouper :
 
-```{r hc-ward-contingency-table-combined-brands}
+```{r table-10-hc-ward-contingency-table-combined-brands}
+print("Table 10 : Table de contingence des résultats de la coupe 4 par rapport aux marques combinées")
 cut_affiche_table_contingence(cars.hc.ward, 4, cars.combined.brand)
 ```
 
-Comme avec le partionnement à deux classes, on observe qu'il existe une classe seulement constituées de voitures américaines (il s'agit rigoureusement de la même classe, voir le dendrogramme), et les autres constituées d'un mélange de voitures américaines et non américaines.
+Comme avec le partitionnement à deux classes, on observe qu'il existe une classe seulement constituées de voitures américaines (il s'agit rigoureusement de la même classe, voir le dendrogramme), et les autres constituées d'un mélange de voitures américaines et non américaines.
 Cependant, à la différence du partitionnement précédent, les valeurs de `brand` sont plus finement séparées.
 
 En effet, la classe 3 contient 78 % de voitures non américaines, et la classe 4 contient 85 % de voitures américaines.
@@ -581,95 +355,14 @@ cars.hc.ward.cluster4 <- cutree(cars.hc.ward, 4)
 
 Etant donné que seule la classe 2 présente des résultats peu concluant, il est intéressant de vérifier la structure de l'arbre qui la constitue pour peut-être la diviser en sous-classes.
 
-On recommence donc le même procédé avec uniquement les individus de la classe 2 (**voir annexe**).
-**[Yann : à mettre la partie ci-dessous en annexe]**
-
-```{r hc-ward-subclass}
-# le sous-arbre de la classe 2 est extrait
-cars.hc.ward.cut4.tree2 <- cut(as.dendrogram(cars.hc.ward), h = 13)$lower[[3]]
-
-# puis on extrait les indices
-library(dendextend)
-cars.hc.ward.cut4.tree2.ind <- as.numeric(names(cutree(cars.hc.ward.cut4.tree2, k=1)))
-
-dist = dist(cars.scaled[cars.hc.ward.cut4.tree2.ind, -8])
-cah.ward = hclust(dist, method="ward.D2")
-
-inertia = sort(cah.ward$height, decreasing = T)
-
-plot(inertia[1:20], type = "s", 
-     xlab = "Nombre de classes", 
-     ylab = "Inertie", 
-     main = "Inertie du dendrogramme en fonction du nombre de classes")
-
-# les points d'intérêts sont 2, 3 et 4
-plot(inertia[1:20], type = "s",
-     xlab = "Nombre de classes", 
-     ylab = "Inertie", 
-     main = "Inertie du dendrogramme avec plus grands gains entourés")
-points(c(2, 3, 4), inertia[c(2, 3, 4)], col = c("green", "red", "blue"), cex = 2, lwd = 3)
-
-# affichage du sous-arbre
-par(mar=c(1,4.5,2,0))
-plot(cah.ward, labels = FALSE, main = "Partitions en 2, 3 ou 4 classes", xlab = "", ylab = "Hauteur", sub = "", hang = -1)
-rect.hclust(cah.ward, 2, border = "green")
-rect.hclust(cah.ward, 3, border = "red")
-rect.hclust(cah.ward, 4, border = "blue")
-
-# affichage des tables de contingence
-cut_affiche_table_contingence(cah.ward, c(2, 3, 4), cars$brand[cars.hc.ward.cut4.tree2.ind])
-
-# on remarque que le partitionnement en deux classes n'est pas suffisant, et que celui à quatre
-# classes est trop. On remarque aussi que la distinction europe-japon est faible.
-
-# combinaison des marques pour le partionnement en 3 classes :
-cah.ward.cut3 <- cutree(cah.ward, 3)
-afficher_table_contingence_clusters(cars.combined.brand[cars.hc.ward.cut4.tree2.ind], cah.ward.cut3)
-```
-
-Bien que le partionnement en trois sous-classes puisse affiner les résultats de la classification au sein de la classe 2, cet affinage est trop faible pour mériter l'ajout de trois nouvelles classes.
+On recommence donc le même procédé avec uniquement les individus de la classe 2 (voir l'annexe 1).
+Bien que le partitionnement en trois sous-classes puisse affiner les résultats de la classification au sein de la classe 2, cet affinage est trop faible pour mériter l'ajout de trois nouvelles classes.
 
 #### 5.3.2 Critères du lien minimum et du lien maximum
 
-De la même manière, nous allons visualiser l'inertie avant le dendrogramme
-
-```{r hc-single-link}
-cars.hc.min = hclust(cars.dist, method="single")
-par(mar=c(1,4.5,2,0))
-plot(cars.hc.min, labels = FALSE, main = "Dendrogramme suite à la CAH avec lien minimum", xlab = "", ylab = "Hauteur", sub = "", hang = -1)
-```
-
-```{r hc-complete-link}
-cars.hc.max = hclust(cars.dist, method="complete")
-par(mar=c(1,4.5,2,0))
-plot(cars.hc.max, labels = FALSE, main = "Dendrogramme suite à la CAH avec lien maximum", xlab = "", ylab = "Hauteur", sub = "", hang = -1)
-
-cars.hc.max.inertia = sort(cars.hc.max$height, decreasing = T)
-
-plot(cars.hc.max.inertia[1:20], type = "s", 
-     xlab = "Nombre de classes", 
-     ylab = "Inertie", 
-     main = "Inertie du dendrogramme en fonction du nombre de classes")
-
-# On remarque des points d'intérêt à 2, 3 et 4
-plot(cars.hc.max.inertia[1:20], type = "s",
-     xlab = "Nombre de classes", 
-     ylab = "Inertie", 
-     main = "Inertie du dendrogramme avec plus grands gains entourés")
-points(c(2, 3, 4, 5), cars.hc.max.inertia[c(2, 3, 4, 5)], col = c("green", "red", "blue", "orange"), cex = 2, lwd = 3)
-
-# affichage
-par(mar=c(1,4.5,2,0))
-plot(cars.hc.max, labels = FALSE, main = "Partitions en 2, 3, 4 ou 5 classes", xlab = "", ylab = "Hauteur", sub = "", hang = -1)
-rect.hclust(cars.hc.max, 2, border = "green")
-rect.hclust(cars.hc.max, 3, border = "red")
-rect.hclust(cars.hc.max, 4, border = "blue")
-rect.hclust(cars.hc.max, 5, border = "orange")
-
-# affichage des tables de contingence
-cut_affiche_table_contingence(cars.hc.max, c(2, 3, 4, 5), cars$brand)
-# TODO: interpreter
-```
+Des CAH ont aussi été effectuées en utilisant les critères du lien minimum et du lien maximum.
+Les résultats n'ayant pas été concluants, nous avons décidé de laisser ces résultats en annexe.
+Voir les annexes 2 et 3.
 
 ## 6. Analyse en composantes principales pour interpréter les classes
 
@@ -773,3 +466,9 @@ cars.hcpc$desc.ind
 Pour chaque groupe, les 5 meilleurs individus les plus proches du centre du cluster sont affichés et sont appelés parangons.
 La distance entre chaque individu et le centre du groupe est fournie.
 Par exemple, les individus représentatifs pour le groupe 2 inclus les individus/véhicules suivants : 87, 34, 229, 208 et 159.
+
+## Conclusion
+
+```{r}
+save(list = ls(all.names = TRUE), file= "../data/all.rda")
+```
