@@ -1,7 +1,8 @@
 ---
-title: "Annexes"
 pdf_document: default
-author: Yann Trividic
+author: "Yann Trividic"
+title: "Annexes"
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -11,7 +12,7 @@ load("../data/all.rda")
 
 ## Annexe 1
 
-```{r annex-1-hc-ward-subclass}
+```{r annex-1-hc-ward-subclass, message=FALSE}
 # le sous-arbre de la classe 2 est extrait
 cars.hc.ward.cut4.tree2 <- cut(as.dendrogram(cars.hc.ward), h = 13)$lower[[3]]
 

@@ -22,14 +22,13 @@ editor_options:
     wrap: sentence
 ---
 
-## Introduction
-
-Dans le cadre de notre 3ème année de licence informatique, il a été demandé aux membres de réaliser un projet d'analyse de jeu données dans le cadre de notre UE traîtement numérique des données.
-L'objet dans ce rapport est un ensemble de voitures représenter par le fichier fourni "275-cars.txt" qui contrairement à son nom, contient les données de 261 voitures.
-
-```{r}
+```{r load-runctions, echo=FALSE}
 source("utils.R")
 ```
+
+## Introduction
+
+Dans le cadre le cadre du cours Traitement numérique des données dispensé en L3 informatique par Dr Nicoleta Rogovschi, il a été demandé aux étudiants de réaliser un projet d'analyse de jeu données. L'objet de ce rapport est d'analyser un ensemble de voitures dont les caractéristiques sont enregistrées dans le fichier `275-cars.txt` qui, contrairement à son nom, contient les données de 261 voitures.
 
 ## 1. Lecture des données
 
@@ -144,6 +143,10 @@ De manière générale, on voit que les voitures européennes ont des caractéri
 Les voitures américaines sont quant à elles très différentes des deux autres catégories.
 
 ### 4.2 Corrélations
+
+```{r corr}
+cars.correlations <- cor(cars[-8]) # on inclut pas la dernière variable
+```
 
 Une matrice de corrélation est utilisée pour visualiser la liaison linéaire entre plusieurs variables.
 Il s'agit d'un tableau contenant les coefficients de corrélation entre chaque variable.
@@ -341,7 +344,6 @@ Comme énoncé dans la section *3. Prétraitement*, la variable `brand` peut êt
 
 ```{r pca}
 library(FactoMineR)
-#catdes(cars[, c(1:8)], 8)
 cars.pca <- PCA(cars.scaled, scale.unit=F, ncp = 10, graph = F, quali.sup = 8)
 ```
 
@@ -391,6 +393,8 @@ Par exemple, les individus représentatifs pour le groupe 2 inclus les suivants 
 
 ## Conclusion
 
-```{r}
+L'analyse de du jeu de données `cars` a permis de mettre en exergue d'un côté les différences entre les voitures américaines et les voitures non américaines, et d'un autre côté les similarités entre les voitures européennes et japonaises. Pour aller plus loin, il serait intéressant de travailler avec des outils de régression pour mettre d'établir des modèles de classification, ce jeu de données ayant toutes les caractéristiques permettant de classer efficacement les voitures selon leurs origines.
+
+```{r save-results, echo=FALSE}
 save(list = ls(all.names = TRUE), file= "../data/all.rda")
 ```
