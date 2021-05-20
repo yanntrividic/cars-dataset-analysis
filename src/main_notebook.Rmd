@@ -117,6 +117,7 @@ Vous devez déposer votre rapport en format .pdf portant le nom : nom1_nom2_nom3
 Les données sont contenues dans un fichier `TXT`, les colonnes sont séparées par le caractère `,` et les lignes par un retour à la ligne.
 Les valeurs décimales sont séparées des valeurs entières par le caractère `.`.
 
+**[Jack : Question bête, mais à quoi sert "head()" ici? pour moi ça affiche rien, à vrai dire, j'arrive même pas à faire print(cars)]**
 ```{r read_file}
 cars = read.table("../data/275-cars.txt", sep=",", header=T)
 head(cars)
@@ -143,7 +144,25 @@ En se basant sur [ce lien](https://www.kaggle.com/abineshkumark/carsdata), on ob
 
 ## 3. Prétraitement
 
+**[Jack : J'ai voulu créer une fonction de pretaitement, mais si vous trouvez que c'est en trop, vous pouvez enlever]**
 ```{r na_values}
+#' Fonction permettant de retirer des lignes avec valeurs manquantes si il y'en a
+#'
+#' @param dataset le dataset dont les valeurs sont à éxaminer
+#' @return result un dataset sans les valeurs na
+remove_na = function(dataset){
+  result=dataset
+  if (sum(is.na(dataset))>0)
+  {
+    print("le dataset a des ligne avec valeurs manquante")
+    print("retrait des lignes avec valeurs manquante")
+    result=subset(dataset, !is.na(dataset))
+  } else if (sum(is.na(dataset))==0) {
+    print("le dataset n'a pas de ligne avec valeurs manquante")
+  }
+  return(result)
+}
+cars = remove_na(cars)
 cars[rowSums(is.na(cars)) > 0,] # counts the number of rows with NA values 
 ```
 
@@ -517,6 +536,7 @@ plot(cars.hc.ward.inertia[1:20], type = "s",
      xlab = "Nombre de classes", 
      ylab = "Inertie", 
      main = "Inertie du dendrogramme avec plus grands gains entourés")
+# TODO: vérifier ma supposition
 points(c(2, 4), cars.hc.ward.inertia[c(2, 4)], col = c("green", "red"), cex = 2, lwd = 3)
 ```
 
@@ -590,6 +610,7 @@ On recommence donc le même procédé avec uniquement les individus de la classe
 # le sous-arbre de la classe 2 est extrait
 cars.hc.ward.cut4.tree2 <- cut(as.dendrogram(cars.hc.ward), h = 13)$lower[[3]]
 # puis on extrait les indices
+# TODO: corriger cette ligne
 cars.hc.ward.cut4.tree2.ind <- as.numeric(names(cutree(cars.hc.ward.cut4.tree2, k=1)))
 
 dist = dist(cars.scaled[cars.hc.ward.cut4.tree2.ind, -8])
