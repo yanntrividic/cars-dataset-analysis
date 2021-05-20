@@ -24,6 +24,9 @@ editor_options:
 
 ## Introduction
 
+Dans le cadre de notre 3ème année de licence informatique, il a été demandé aux membres de réaliser un projet d'analyse de jeu données dans le cadre de notre UE traîtement numérique des données.
+L'objet dans ce rapport est un ensemble de voitures représenter par le fichier fourni "275-cars.txt" qui contrairement à son nom, contient les données de 261 voitures.
+
 ```{r}
 source("utils.R")
 ```
