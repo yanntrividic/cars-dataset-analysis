@@ -110,6 +110,8 @@ Vous devez déposer votre rapport en format .pdf portant le nom : nom1_nom2_nom3
 
 -   Expliciter des tendances sous-jacentes du jeu de données, analyse descriptive du jeu de données pour mieux comprendre les liens entre les différentes variables, et ainsi mieux comprendre les performances des véhicules en fonction de leurs attributs.
 
+
+
 # Code
 
 ## 1. Lecture des données
@@ -119,7 +121,7 @@ Les valeurs décimales sont séparées des valeurs entières par le caractère `
 
 ```{r read_file}
 cars = read.table("../data/275-cars.txt", sep=",", header=T)
-head(cars)
+print(head(cars))
 ```
 
 ## 2. Descriptions du jeu de données
@@ -515,6 +517,7 @@ plot(cars.hc.ward.inertia[1:20], type = "s",
      xlab = "Nombre de classes", 
      ylab = "Inertie", 
      main = "Inertie du dendrogramme avec plus grands gains entourés")
+# TODO: vérifier ma supposition
 points(c(2, 4), cars.hc.ward.inertia[c(2, 4)], col = c("green", "red"), cex = 2, lwd = 3)
 ```
 
@@ -677,16 +680,11 @@ Grâce à l'ACP, nous tenons compte des liaisons entre les variables.
 
 ```{r pca}
 library("FactoMineR")
-library("factoextra")
 # paramètres à ajuster
 #catdes(cars[, c(1:8)], 8)
 
-# TODO: changer pour PCA
-#cars.pca <- prcomp(cars[c(1:7)], center = TRUE,scale. = TRUE)
 cars.pca <- PCA(cars.scaled[-8], scale.unit=F, ncp = 2, graph = F)
-cars.pca
 summary(cars.pca)
-
 ```
 
 On obtient alors 7 composantes principales allant de `Dim1` à `Dim7`.
