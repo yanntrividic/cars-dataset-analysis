@@ -147,7 +147,6 @@ En se basant sur [ce lien](https://www.kaggle.com/abineshkumark/carsdata), on ob
 cars[rowSums(is.na(cars)) > 0,] # counts the number of rows with NA values 
 ```
 
-
 Le jeu de données ne contient aucune valeur manquante, il peut donc être utilisé tel quel pour la suite de l'analyse.
 
 Seule la variable `brand` est une variable textuelle et catégorielle dans ce jeu de données.
@@ -224,8 +223,8 @@ Le jeu de données `cars` contient, en plus des sept variables quantitatives dé
 Cette donnée, par sa nature, doit être traitée séparément du reste.
 
 ```{r piechart-brand}
-library(ggplot2)
-library(dplyr)
+library(ggplot2, warn.conflicts = FALSE)
+library(dplyr, warn.conflicts = FALSE)
 
 contingency_table <- table(cars$brand) 
 df <- data.frame(brand = names(contingency_table),
@@ -379,7 +378,7 @@ Voici maintenant une visualisation de ces partitionnement couplés aux distribut
 
 ```{r stripplots-clusters}
 library(lattice)
-library(gridExtra)
+library(gridExtra, warn.conflicts = FALSE)
 
 #' Fonction permettant d'afficher une série de strip plots des variables d'un
 #' data.frame et de les colorer et fonction de classes.
@@ -510,7 +509,6 @@ plot(cars.hc.ward.inertia[1:20], type = "s",
 Avant même de s'intéresser au dendrogramme en lui-même, il est intéressant de visualiser son inertie.
 Ici, deux sauts se distinguent nettement.
 Les deux variations d'inertie les plus grandes sont à 2 classes et à 4 classes :
-**[Jack : je suppose que cah.ward.inertia = cars.hc.ward.inertia ? sinon le code ne se lançait pas]**
 
 ```{r hc-ward-inertia-critical-points}
 plot(cars.hc.ward.inertia[1:20], type = "s",
@@ -584,12 +582,13 @@ Etant donné que seule la classe 2 présente des résultats peu concluant, il es
 
 On recommence donc le même procédé avec uniquement les individus de la classe 2 (**voir annexe**).
 **[Yann : à mettre la partie ci-dessous en annexe]**
-**[Jack : la ligne cars.hc.ward.cut4.tree2.ind <- as.numeric(names(cutree(cars.hc.ward.cut4.tree2, k=1))) me donne 'tree' incorrect (composante 'merge'), j'ai éssayé de corriger mais j'ai pas trouvé]**
 
 ```{r hc-ward-subclass}
 # le sous-arbre de la classe 2 est extrait
 cars.hc.ward.cut4.tree2 <- cut(as.dendrogram(cars.hc.ward), h = 13)$lower[[3]]
+
 # puis on extrait les indices
+library(dendextend)
 cars.hc.ward.cut4.tree2.ind <- as.numeric(names(cutree(cars.hc.ward.cut4.tree2, k=1)))
 
 dist = dist(cars.scaled[cars.hc.ward.cut4.tree2.ind, -8])
@@ -623,6 +622,7 @@ cut_affiche_table_contingence(cah.ward, c(2, 3, 4), cars$brand[cars.hc.ward.cut4
 # classes est trop. On remarque aussi que la distinction europe-japon est faible.
 
 # combinaison des marques pour le partionnement en 3 classes :
+cah.ward.cut3 <- cutree(cah.ward, 3)
 afficher_table_contingence_clusters(cars.combined.brand[cars.hc.ward.cut4.tree2.ind], cah.ward.cut3)
 ```
 
@@ -691,8 +691,8 @@ summary(cars.pca)
 
 On obtient alors 7 composantes principales allant de `Dim1` à `Dim7`.
 
-Dans ces résultats, la première composante `Dim1` présente une forte association avec l'ensemble des variables expceptés pour "year". Cette associativité est négative pour "mpg" (-89%) , "time.to.60" (-71%) et "year" (-48%)
-[**TODO: ajouter des valeurs]**
+Dans ces résultats, la première composante `Dim1` présente une forte association avec l'ensemble des variables expceptés pour "year".
+Cette associativité est négative pour "mpg" (-89%) , "time.to.60" (-71%) et "year" (-48%) [\*\*TODO: ajouter des valeurs]\*\*
 
 Le tableau des valeurs propres est un outil permettant de déterminer quels sont les axes à prendre en compte pour l'ACP.
 Il est important que les valeurs propres des axes retenus restituent une part importante de la variance totale du jeu de données.
@@ -700,7 +700,8 @@ Cela signifie que la somme de l'inertie expliquée par chacun des axes représen
 C'est pour cette raison que nous allons retenir `Dim1` et `Dim2`, représentant respectivement 72 et 13 % d'inertie, pour un total de 85 % d'inertie.
 On peut dire que ces deux axes restituent 85 % des informations du jeu de données d'origine.
 
-Cette somme est une mesure de la fiabilité de la qualité globale explicative de l’analyse. **[TODO: définir lecture des mappings, perso je vois pas ce que tu veux dire]**
+Cette somme est une mesure de la fiabilité de la qualité globale explicative de l'analyse.
+**[TODO: définir lecture des mappings, perso je vois pas ce que tu veux dire]**
 
 Nous allons réaliser une représentation graphique de notre ACP, nous utilserons un biplot pour cela.
 
@@ -718,14 +719,13 @@ fviz_pca_var(cars.pca, col.var = "black")
 
 Le graphique nous montre que sur les sept variables représentées, six sont corrélées avec `Dim1`, une observation cohérente puisque cette composante a une inertie de 72 % dans l'ensemble du data set.
 Parmi les variables corrélées négativement avec `Dim2` nous trouvons `time.to.60` et `mpg`.
-Elle mesure donc principalement le gabarit du véhicule et du moteur, ainsi que sa puissance
-**[TODO : ce n'est pas vrai, c'est le contraire d'ailleurs. time.to.60 est la variable la moins corrélée avec Dim1 parmi les 6. A remplacer par un truc du genre "Elle mesure donc principalement le gabarit du véhicule et du moteur, ainsi que sa puissance"]**
+Elle mesure donc principalement le gabarit du véhicule et du moteur, ainsi que sa puissance **[TODO : ce n'est pas vrai, c'est le contraire d'ailleurs. time.to.60 est la variable la moins corrélée avec Dim1 parmi les 6. A remplacer par un truc du genre "Elle mesure donc principalement le gabarit du véhicule et du moteur, ainsi que sa puissance"]**
 
 Parmi les variables corrélées positivement avec `Dim1` nous avons les variables `hp` (95%), `cylinders` (93%), `cubicinches` (96%) et `weightlbs` (92%).
 **[TODO: ajouter les valeurs de ces corrélations].**
 
-Pour `Dim2`, l'unique variable qui lui est corrélée est `year`(86%), et elle est corrélée de façon positive. Dim2 caractérise alors l'âge du véhicule, nous pouvons également ajouter que l'âge est anti corrélé avec Dim2, ce qui implique que sur le graphique des individus, les voitures les plus vieilles seront plutôt en bas du graphique
-[**TODO : pas si on regarde les résultats de prcomp - rmq prise en compte]**.
+Pour `Dim2`, l'unique variable qui lui est corrélée est `year`(86%), et elle est corrélée de façon positive.
+Dim2 caractérise alors l'âge du véhicule, nous pouvons également ajouter que l'âge est anti corrélé avec Dim2, ce qui implique que sur le graphique des individus, les voitures les plus vieilles seront plutôt en bas du graphique [\*\*TODO : pas si on regarde les résultats de prcomp - rmq prise en compte]\*\*.
 
 L'ensemble des variables se trouvent relativement loin de l'origine, elles sont donc bien représentées par l'ACP.
 Nous pouvons vérifier cela en visualisant le carré du cosinus des variables sur toutes les dimensions en utilisant la bibliothèque `corrplot`.
@@ -785,11 +785,14 @@ fviz_cluster(cars.hcpc,
 
 cars.hcpc$desc.axes$quanti
 ```
-Les résultats ci-dessus indiquent que les individus dans les groupes 1 et 3 ont des coordonnées élevées sur l’axe 1 (Dim1) et l'axe 2(Dim2) .
-Les individus du groupe 2 ont des coordonnées élevées uniquement sur le deuxième axe.
 
+Les résultats ci-dessus indiquent que les individus dans les groupes 1 et 3 ont des coordonnées élevées sur l'axe 1 (Dim1) et l'axe 2(Dim2) .
+Les individus du groupe 2 ont des coordonnées élevées uniquement sur le deuxième axe.
 
 ```{r hcpc-description-par-les-individus}
 cars.hcpc$desc.ind
 ```
-Pour chaque groupe, les 5 meilleurs individus les plus proches du centre du cluster sont affichés et sont appelés paragones. La distance entre chaque individu et le centre du groupe est fournie. Par exemple, les individus représentatifs pour le groupe 2 inclus les individus/véhicules suivants : 87, 34, 229, 208 et 159 
+
+Pour chaque groupe, les 5 meilleurs individus les plus proches du centre du cluster sont affichés et sont appelés paragones.
+La distance entre chaque individu et le centre du groupe est fournie.
+Par exemple, les individus représentatifs pour le groupe 2 inclus les individus/véhicules suivants : 87, 34, 229, 208 et 159
